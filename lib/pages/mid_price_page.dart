@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/models/asset.dart';
-import 'package:midpriceapp/models/asset_brl_stock_category.dart';
-import 'package:midpriceapp/models/deposit.dart';
+import 'package:midpriceapp/models/asset/asset.dart';
+import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
+import 'package:midpriceapp/models/deposit/deposit.dart';
 import 'package:midpriceapp/pages/form/wallet_page_form.dart';
 
 class MidPricePage extends StatefulWidget {

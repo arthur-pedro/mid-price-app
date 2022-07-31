@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:midpriceapp/pages/deposit_page.dart';
 import 'package:midpriceapp/pages/mid_price_page.dart';
 import 'package:midpriceapp/pages/wallet_page.dart';
-import 'package:midpriceapp/repositories/asset_repository.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:midpriceapp/theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+      //   MultiProvider(
+      //   providers: [
+      //     ChangeNotifierProvider(create: (context) => AssetRepository()),
+      //   ],
+      //   child: const MyApp(),
+      // )
+      const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -45,8 +51,6 @@ class TabPage extends StatefulWidget {
 }
 
 class _TabPagePageState extends State<TabPage> {
-  final tabela = AssetRepository.tabela;
-
   final String title = 'Rebalance';
 
   @override

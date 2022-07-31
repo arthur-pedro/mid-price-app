@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:midpriceapp/models/asset.dart';
-import 'package:midpriceapp/models/deposit.dart';
-import 'package:midpriceapp/repositories/asset_repository.dart';
+import 'package:midpriceapp/models/asset/asset.dart';
+import 'package:midpriceapp/models/deposit/deposit.dart';
 
 // ignore: must_be_immutable
 class DepositForm extends StatefulWidget {
@@ -24,7 +23,7 @@ class _DepositForm extends State<DepositForm> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final wallet = AssetRepository.tabela;
+  List<Asset> wallet = [];
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-import 'package:midpriceapp/models/asset.dart';
+import 'package:midpriceapp/models/asset/asset.dart';
 
 class Deposit {
   int? id;

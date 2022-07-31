@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:midpriceapp/models/asset.dart';
-import 'package:midpriceapp/models/asset_brl_fii_category.dart';
-import 'package:midpriceapp/models/asset_brl_stock_category.dart';
-import 'package:midpriceapp/models/asset_category.dart';
+import 'package:midpriceapp/models/asset/asset.dart';
+import 'package:midpriceapp/models/category/asset_brl_fii_category.dart';
+import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
+import 'package:midpriceapp/models/category/asset_category.dart';
 
 class WalletForm extends StatefulWidget {
   Asset asset = Asset(name: '', price: 0, category: AssetBrlStockCategory());
@@ -123,11 +123,10 @@ class _WalletForm extends State<WalletForm> {
                             String msg = '';
                             if (isUpdate) {
                               msg = 'Ativo atualizado.';
-                              Navigator.pop(context);
                             } else {
                               msg = 'Ativo adicionado à carteira.';
-                              Navigator.pop(context, widget.asset);
                             }
+                            Navigator.pop(context, widget.asset);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(msg)),
                             );

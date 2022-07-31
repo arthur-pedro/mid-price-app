@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/models/asset.dart';
-import 'package:midpriceapp/models/asset_brl_stock_category.dart';
+import 'package:midpriceapp/database/asset/asset_repository.dart';
+import 'package:midpriceapp/models/asset/asset.dart';
+import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
 import 'package:midpriceapp/pages/form/wallet_page_form.dart';
+import 'package:provider/provider.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -14,14 +16,75 @@ class WalletPage extends StatefulWidget {
 
 class _WalletPage extends State<WalletPage> {
   String title = "Minha Carteira - Rebalance";
-  List<Asset> assets = [];
+
+  late List<Asset> wallet = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+  }
+
+  // @override
+  // void dispose() {
+  //   AssetRepository.instance.close();
+  //   super.dispose();
+  // }
+
+  Future refresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    wallet = await AssetRepository.instance.list();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future create(Asset asset) async {
+    setState(() {
+      isLoading = true;
+    });
+    await AssetRepository.instance.create(asset);
+    await refresh();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future update(Asset asset) async {
+    setState(() {
+      isLoading = true;
+    });
+    await AssetRepository.instance.update(asset);
+    await refresh();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future delete(Asset asset) async {
+    setState(() {
+      isLoading = true;
+    });
+    await AssetRepository.instance.delete(asset);
+    await refresh();
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return assets.isEmpty ? buildEmptyScreen() : buildList();
+    // final assetRepo = context.watch<AssetRepository>();
+    // final loc = context.read();
+    return wallet.isEmpty
+        ? buildEmptyScreen(context)
+        : buildList(context, wallet);
   }
 
-  buildEmptyScreen() {
+  buildEmptyScreen(BuildContext context) {
     return SizedBox(
       child: Center(
         child: Column(
@@ -42,9 +105,11 @@ class _WalletPage extends State<WalletPage> {
                   ),
                 ).then((value) => {
                       if (value != null)
-                        setState(() {
-                          assets.add(value);
-                        }),
+                        {
+                          setState(() {
+                            create(value);
+                          })
+                        },
                     });
               },
               child: const Text('Adicionar'),
@@ -55,7 +120,7 @@ class _WalletPage extends State<WalletPage> {
     );
   }
 
-  buildList() {
+  buildList(BuildContext context, List<Asset> assets) {
     return Scaffold(
         body: ListView.separated(
             itemBuilder: (BuildContext context, int index) {
@@ -79,7 +144,9 @@ class _WalletPage extends State<WalletPage> {
                     MaterialPageRoute(
                       builder: (context) => WalletForm(asset: assets[index]),
                     ),
-                  ).whenComplete(() => setState(() {}))
+                  ).then((asset) => setState(() {
+                        update(asset);
+                      }))
                 },
               );
             },
@@ -97,7 +164,12 @@ class _WalletPage extends State<WalletPage> {
                         category: AssetBrlStockCategory(), name: '', price: 0)),
               ),
             ).then((asset) => {
-                  setState(() => {assets.add(asset)})
+                  if (asset != null)
+                    {
+                      setState(() {
+                        create(asset);
+                      })
+                    }
                 })
           },
           tooltip: 'Novo Investimento',

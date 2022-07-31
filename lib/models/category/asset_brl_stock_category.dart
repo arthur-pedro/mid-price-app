@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/models/asset_category.dart';
+import 'package:midpriceapp/models/category/asset_category.dart';
 
 class AssetBrlStockCategory implements AssetCategory {
   @override
