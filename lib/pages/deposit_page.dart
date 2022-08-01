@@ -277,26 +277,27 @@ class _DepositPage extends State<DepositPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            const Text('Sua carteira esta vazia. Adicione seu primeiro ativo!'),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(_createRouteWallet(WalletForm(
-                        asset: Asset(
-                            name: '',
-                            price: 0.0,
-                            category: AssetBrlStockCategory()))))
-                    .then((value) => {
-                          if (value != null)
-                            {
-                              setState(() {
-                                createAsset(value);
-                              })
-                            },
-                        });
-              },
-              child: const Text('Adicionar'),
-            ),
+            const Text('Sua carteira esta vazia.'),
+            const Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.of(context)
+            //         .push(_createRouteWallet(WalletForm(
+            //             asset: Asset(
+            //                 name: '',
+            //                 price: 0.0,
+            //                 category: AssetBrlStockCategory()))))
+            //         .then((value) => {
+            //               if (value != null)
+            //                 {
+            //                   setState(() {
+            //                     createAsset(value);
+            //                   })
+            //                 },
+            //             });
+            //   },
+            //   child: const Text('Adicionar'),
+            // ),
             Container(
                 child:
                     GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),

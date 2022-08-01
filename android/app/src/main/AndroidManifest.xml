@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.rebalance.midprice">
-   <application
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application
         android:label="Rebalance - Preço Médio"
         android:name="${applicationName}"
         android:icon="@mipmap/logo">
@@ -47,6 +48,4 @@
             <data android:scheme="tel" />
         </intent>
     </queries>
-
-    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

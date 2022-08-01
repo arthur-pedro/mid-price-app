@@ -57,27 +57,28 @@ class _MidPricePage extends State<MidPricePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            const Text('Sua carteira esta vazia. Adicione seu primeiro ativo!'),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WalletForm(
-                        asset: Asset(
-                            name: '',
-                            price: 0.0,
-                            category: AssetBrlStockCategory())),
-                  ),
-                ).then((value) => {
-                      if (value != null)
-                        setState(() {
-                          wallet.add(value);
-                        }),
-                    });
-              },
-              child: const Text('Adicionar'),
-            )
+            const Text('Sua carteira esta vazia.'),
+            const Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => WalletForm(
+            //             asset: Asset(
+            //                 name: '',
+            //                 price: 0.0,
+            //                 category: AssetBrlStockCategory())),
+            //       ),
+            //     ).then((value) => {
+            //           if (value != null)
+            //             setState(() {
+            //               wallet.add(value);
+            //             }),
+            //         });
+            //   },
+            //   child: const Text('Adicionar'),
+            // )
           ],
         ),
       ),
