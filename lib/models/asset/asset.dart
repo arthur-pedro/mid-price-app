@@ -1,7 +1,11 @@
 import 'package:midpriceapp/database/asset/asset_bo.dart';
+import 'package:midpriceapp/models/category/asset_brl_etf_category.dart';
 import 'package:midpriceapp/models/category/asset_brl_fii_category.dart';
 import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
 import 'package:midpriceapp/models/category/asset_category.dart';
+import 'package:midpriceapp/models/category/asset_cdb_category.dart';
+import 'package:midpriceapp/models/category/asset_others_category.dart';
+import 'package:midpriceapp/models/category/asset_treasure_category%20copy.dart';
 import 'package:midpriceapp/util/parser.dart';
 
 class Asset {
@@ -47,8 +51,17 @@ class Asset {
       case 'FUNDO_INVESTIMENTO_IMOBILIARIO':
         res = AssetBrlFiiCategory();
         break;
+      case 'CDB':
+        res = AssetCdbCategory();
+        break;
+      case 'TESOURO_DIRETO':
+        res = AssetTreasureCategory();
+        break;
+      case 'BRL_ETF':
+        res = AssetBrlEtfCategory();
+        break;
       default:
-        res = AssetBrlStockCategory();
+        res = AssetOtherCategory();
         break;
     }
     return res;

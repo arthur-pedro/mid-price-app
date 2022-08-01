@@ -1,4 +1,5 @@
 abstract class AssetBO {
+  static const String tableName = 'wallet';
   static const String id = 'id';
   static const String name = 'asset_name';
   static const String price = 'price';

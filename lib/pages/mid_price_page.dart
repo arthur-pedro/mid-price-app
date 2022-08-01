@@ -1,8 +1,15 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:midpriceapp/adMob/google_ad_mob_handler.dart';
+import 'package:midpriceapp/database/asset/asset_repository.dart';
+import 'package:midpriceapp/database/deposit/deposit_repository.dart';
 import 'package:midpriceapp/models/asset/asset.dart';
 import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
 import 'package:midpriceapp/models/deposit/deposit.dart';
-import 'package:midpriceapp/pages/form/wallet_page_form.dart';
+import 'package:midpriceapp/pages/form/wallet_form_page.dart';
 
 class MidPricePage extends StatefulWidget {
   const MidPricePage({Key? key}) : super(key: key);
@@ -14,12 +21,33 @@ class MidPricePage extends StatefulWidget {
 class _MidPricePage extends State<MidPricePage> {
   String title = "Minha Carteira - Rebalance";
 
-  List<Deposit> deposits = []; //DepositRepository.tabela;
-  List<Asset> assets = []; //AssetRepository.tabela;
+  List<Deposit> deposits = [];
+  List<Asset> wallet = [];
+  bool isLoading = false;
+  int yearFilter = DateTime.now().year;
+  List<int> yearList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+  }
+
+  Future refresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    wallet = await AssetRepository.instance.list();
+    deposits = await DepositRepository.instance.list();
+    yearList = deposits.map((deposit) => deposit.date.year).toList();
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return assets.isEmpty ? buildEmptyScreen() : buildList();
+    return wallet.isEmpty ? buildEmptyScreen() : buildList();
   }
 
   buildEmptyScreen() {
@@ -44,7 +72,7 @@ class _MidPricePage extends State<MidPricePage> {
                 ).then((value) => {
                       if (value != null)
                         setState(() {
-                          assets.add(value);
+                          wallet.add(value);
                         }),
                     });
               },
@@ -58,24 +86,38 @@ class _MidPricePage extends State<MidPricePage> {
 
   buildList() {
     return Scaffold(
-        body: ListView.separated(
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                contentPadding: const EdgeInsets.all(10),
-                minLeadingWidth: 20,
-                leading: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[getMidpriceIndicator(assets[index])]),
-                title: Text(assets[index].name),
-                subtitle: Text('Preço atual R\$ ${assets[index].price}'),
-                trailing: Text(getMidprice(assets[index], true)),
-                onTap: () => {},
-              );
-            },
-            separatorBuilder: (_, ___) => const Divider(
-                  height: 0,
-                ),
-            itemCount: assets.length));
+        body: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Expanded(
+            child: SizedBox(
+                height: 200.0,
+                child: ListView.separated(
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        contentPadding: const EdgeInsets.all(10),
+                        minLeadingWidth: 20,
+                        leading: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              getMidpriceIndicator(wallet[index])
+                            ]),
+                        title: Text(wallet[index].name),
+                        subtitle:
+                            Text('Preço atual R\$ ${wallet[index].price}'),
+                        trailing: Text(getMidprice(wallet[index], true)),
+                        onTap: () => {},
+                      );
+                    },
+                    separatorBuilder: (_, ___) => const Divider(
+                          height: 0,
+                        ),
+                    itemCount: wallet.length))),
+        Container(
+            child: GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
+      ],
+    ));
   }
 
   String getMidprice(Asset asset, bool mask) {

@@ -1,5 +1,5 @@
 name: midpriceapp
-description: A new Flutter project.
+description: Calculadora de preço médio
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -45,6 +45,7 @@ dependencies:
   path_provider: ^2.0.11
   sqflite: ^2.0.3
   provider: ^6.0.3
+  admob_flutter: ^3.0.0
   
 
 dev_dependencies:

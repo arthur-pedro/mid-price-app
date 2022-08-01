@@ -1,15 +1,88 @@
-import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
+import 'package:midpriceapp/database/asset/asset_bo.dart';
+import 'package:midpriceapp/database/db_provider.dart';
+import 'package:midpriceapp/database/deposit/deposit_bo.dart';
+import 'package:midpriceapp/database/generic_repository.dart';
 import 'package:midpriceapp/models/deposit/deposit.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
-class DepositRepository {
-  static List<Deposit> tabela = [
-    Deposit(
-        quantity: 8.54,
-        payedValue: 5,
-        asset:
-            Asset(category: AssetBrlStockCategory(), name: 'ITSA4', price: 0),
-        date: DateTime(2022, 7, 7),
-        id: 1),
-  ];
+class DepositRepository extends DBProvider
+    implements GenericRepository<Deposit> {
+  static final DepositRepository instance = DepositRepository._init();
+
+  DepositRepository._init();
+
+  @override
+  String tableName = DepositBO.tableName;
+
+  @override
+  Future<Deposit> get(int id) async {
+    final db = await DepositRepository.instance.database;
+    final result = await db.query(tableName,
+        where: '${DepositBO.id} = ?', whereArgs: [id], limit: 1);
+    if (result.isNotEmpty) {
+      return Deposit.fromJson(result.first);
+    } else {
+      throw Exception('Deposit { id: $id } nof found');
+    }
+  }
+
+  @override
+  Future<List<Deposit>> list() async {
+    final db = await DepositRepository.instance.database;
+    List result = await db.rawQuery('''
+      SELECT
+        ${DepositBO.tableName}.${DepositBO.id},
+        ${DepositBO.tableName}.${DepositBO.date},
+        ${DepositBO.tableName}.${DepositBO.quantity},
+        ${DepositBO.tableName}.${DepositBO.asset},
+        ${DepositBO.tableName}.${DepositBO.payedValue},
+        ${DepositBO.tableName}.${DepositBO.operation},
+        ${DepositBO.tableName}.${DepositBO.fee},
+        ${AssetBO.tableName}.${AssetBO.id} AS ${DepositBO.aliasPkAssetId},
+        ${AssetBO.tableName}.${AssetBO.name} AS ${DepositBO.aliasPkAssetName},
+        ${AssetBO.tableName}.${AssetBO.price} AS ${DepositBO.aliasPkAssetPrice},
+        ${AssetBO.tableName}.${AssetBO.category} AS ${DepositBO.aliasPkAssetCategory}
+      FROM
+        ${DepositBO.tableName}
+      INNER JOIN
+        ${AssetBO.tableName} 
+      ON 
+        ${DepositBO.tableName}.${DepositBO.asset} = ${AssetBO.tableName}.${AssetBO.name}
+      ORDER BY 
+        ${DepositBO.date} ASC
+    ''');
+    return result.map((json) => Deposit.fromJson(json)).toList();
+  }
+
+  @override
+  Future<Deposit> create(Deposit entity) async {
+    final db = await DepositRepository.instance.database;
+    await db.insert(
+      tableName,
+      Deposit.toJson(entity),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    return entity;
+  }
+
+  @override
+  Future<Deposit> update(Deposit entity) async {
+    try {
+      final db = await DepositRepository.instance.database;
+      await db.update(tableName, Deposit.toJson(entity),
+          where: '${DepositBO.id} = ?', whereArgs: [entity.id]);
+      return entity;
+    } catch (e) {
+      throw Exception('Erro ao atualizar o aporte: ${Deposit.toJson(entity)}');
+    }
+  }
+
+  @override
+  Future<Deposit> delete(Deposit entity) async {
+    final db = await DepositRepository.instance.database;
+    await db.delete(tableName,
+        where: '${DepositBO.id} = ?', whereArgs: [entity.id]);
+    return entity;
+  }
 }

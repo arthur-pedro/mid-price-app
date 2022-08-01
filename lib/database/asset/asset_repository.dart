@@ -1,65 +1,17 @@
-import 'package:flutter/cupertino.dart';
+import 'package:midpriceapp/database/db_provider.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:midpriceapp/database/asset/asset_bo.dart';
 import 'package:midpriceapp/database/generic_repository.dart';
 import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:sqflite/sqflite.dart';
 
-class AssetRepository implements GenericRepository<Asset> {
+class AssetRepository extends DBProvider implements GenericRepository<Asset> {
   static final AssetRepository instance = AssetRepository._init();
 
   AssetRepository._init();
 
-  AssetRepository() {
-    initRepository();
-  }
-
   @override
-  Database? db;
-
-  @override
-  late String tableName = 'wallet';
-
-  @override
-  late String dbName = 'wallet';
-
-  @override
-  late String script = '''
-    CREATE TABLE IF NOT EXISTS wallet (
-      ${AssetBO.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-      ${AssetBO.name} TEXT NOT NULL,
-      ${AssetBO.price} TEXT NOT NULL,
-      ${AssetBO.category} TEXT NOT NULL
-    );
-  ''';
-  @override
-  Future initRepository() async {
-    await list();
-  }
-
-  @override
-  Future createDB(db, version) async {
-    await db.execute(script);
-  }
-
-  Future<Database> get database async {
-    if (db != null) return db!;
-    db = await _initDatabase(tableName)!;
-    return db!;
-  }
-
-  _initDatabase(String dbName) async {
-    return await openDatabase(join(await getDatabasesPath(), dbName),
-        version: 1, onCreate: createDB);
-  }
-
-  @override
-  Future close() async {
-    final db = await instance.database;
-    if (db.isOpen) {
-      db.close();
-    }
-  }
+  late String tableName = AssetBO.tableName;
 
   @override
   Future<Asset> get(int id) async {

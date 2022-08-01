@@ -1,9 +1,10 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:midpriceapp/adMob/google_ad_mob_handler.dart';
 import 'package:midpriceapp/database/asset/asset_repository.dart';
 import 'package:midpriceapp/models/asset/asset.dart';
 import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
-import 'package:midpriceapp/pages/form/wallet_page_form.dart';
-import 'package:provider/provider.dart';
+import 'package:midpriceapp/pages/form/wallet_form_page.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -25,12 +26,6 @@ class _WalletPage extends State<WalletPage> {
     super.initState();
     refresh();
   }
-
-  // @override
-  // void dispose() {
-  //   AssetRepository.instance.close();
-  //   super.dispose();
-  // }
 
   Future refresh() async {
     setState(() {
@@ -75,6 +70,25 @@ class _WalletPage extends State<WalletPage> {
     });
   }
 
+  Route _createRoute(WalletForm page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // final assetRepo = context.watch<AssetRepository>();
@@ -94,26 +108,26 @@ class _WalletPage extends State<WalletPage> {
             const Text('Sua carteira esta vazia. Adicione seu primeiro ativo!'),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WalletForm(
+                Navigator.of(context)
+                    .push(_createRoute(WalletForm(
                         asset: Asset(
                             name: '',
                             price: 0.0,
-                            category: AssetBrlStockCategory())),
-                  ),
-                ).then((value) => {
-                      if (value != null)
-                        {
-                          setState(() {
-                            create(value);
-                          })
-                        },
-                    });
+                            category: AssetBrlStockCategory()))))
+                    .then((value) => {
+                          if (value != null)
+                            {
+                              setState(() {
+                                create(value);
+                              })
+                            },
+                        });
               },
               child: const Text('Adicionar'),
-            )
+            ),
+            Container(
+                child:
+                    GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
           ],
         ),
       ),
@@ -122,55 +136,70 @@ class _WalletPage extends State<WalletPage> {
 
   buildList(BuildContext context, List<Asset> assets) {
     return Scaffold(
-        body: ListView.separated(
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                contentPadding: const EdgeInsets.all(10),
-                minLeadingWidth: 10,
-                leading: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      assets[index].category.icon,
-                    ]),
-                title: Text(
-                  assets[index].name,
-                ),
-                subtitle: Text(assets[index].category.name),
-                trailing: Text('R\$ ${assets[index].price.toString()}'),
-                onTap: () => {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WalletForm(asset: assets[index]),
-                    ),
-                  ).then((asset) => setState(() {
-                        update(asset);
-                      }))
-                },
-              );
-            },
-            separatorBuilder: (_, ___) => const Divider(
-                  height: 0,
-                ),
-            itemCount: assets.length),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Expanded(
+                child: SizedBox(
+              height: 200.0,
+              child: ListView.separated(
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      contentPadding: const EdgeInsets.all(10),
+                      minLeadingWidth: 10,
+                      leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            assets[index].category.icon,
+                          ]),
+                      title: Text(
+                        assets[index].name,
+                      ),
+                      subtitle: Text(assets[index].category.name),
+                      trailing: Text('R\$ ${assets[index].price.toString()}'),
+                      onTap: () => {
+                        Navigator.of(context)
+                            .push(
+                                _createRoute(WalletForm(asset: assets[index])))
+                            .then((asset) => setState(() {
+                                  if (asset != null) {
+                                    update(asset);
+                                  }
+                                }))
+                      },
+                    );
+                  },
+                  separatorBuilder: (_, ___) => const Divider(
+                        height: 0,
+                      ),
+                  itemCount: assets.length),
+            )),
+            Container(
+                child:
+                    GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
+          ],
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => WalletForm(
+            Navigator.of(context)
+                .push(_createRoute(WalletForm(
                     asset: Asset(
-                        category: AssetBrlStockCategory(), name: '', price: 0)),
-              ),
-            ).then((asset) => {
-                  if (asset != null)
-                    {
-                      setState(() {
-                        create(asset);
-                      })
-                    }
-                })
+                        name: '',
+                        price: 0.0,
+                        category: AssetBrlStockCategory()))))
+                .then((asset) => {
+                      if (asset != null)
+                        {
+                          setState(() {
+                            if (wallet.isNotEmpty && (wallet.length % 5) == 0) {
+                              GoogleAdmobHandler.showInterstitial();
+                            }
+                            create(asset);
+                          })
+                        }
+                    })
           },
           tooltip: 'Novo Investimento',
           child: const Icon(Icons.add),

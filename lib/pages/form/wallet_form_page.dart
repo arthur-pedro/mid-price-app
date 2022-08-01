@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:midpriceapp/models/asset/asset.dart';
+import 'package:midpriceapp/models/category/asset_brl_etf_category.dart';
 import 'package:midpriceapp/models/category/asset_brl_fii_category.dart';
 import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
 import 'package:midpriceapp/models/category/asset_category.dart';
+import 'package:midpriceapp/models/category/asset_cdb_category.dart';
+import 'package:midpriceapp/models/category/asset_others_category.dart';
+import 'package:midpriceapp/models/category/asset_treasure_category%20copy.dart';
 
 class WalletForm extends StatefulWidget {
   Asset asset = Asset(name: '', price: 0, category: AssetBrlStockCategory());
@@ -22,7 +26,11 @@ class _WalletForm extends State<WalletForm> {
 
   final List<AssetCategory> _categories = [
     AssetBrlStockCategory(),
-    AssetBrlFiiCategory()
+    AssetBrlFiiCategory(),
+    AssetTreasureCategory(),
+    AssetCdbCategory(),
+    AssetBrlEtfCategory(),
+    AssetOtherCategory(),
   ];
 
   @override
@@ -30,6 +38,7 @@ class _WalletForm extends State<WalletForm> {
     bool isUpdate = false;
     if (widget.asset.id != null) {
       isUpdate = true;
+      title = 'Atualização de ativo';
     }
 
     return Scaffold(
@@ -42,14 +51,14 @@ class _WalletForm extends State<WalletForm> {
             child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormField(
                       initialValue: widget.asset.name,
                       keyboardType: TextInputType.text,
                       maxLength: 50,
-                      decoration:
-                          const InputDecoration(hintText: 'TIcker Ex: ITSA4'),
+                      decoration: const InputDecoration(
+                          labelText: 'Ticker', hintText: 'Ex: ITSA4'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Campo obrigatório';
@@ -100,7 +109,9 @@ class _WalletForm extends State<WalletForm> {
                         ),
                       ],
                       decoration: const InputDecoration(
-                          hintText: 'Preço Ex: R\$ 10', prefixText: 'R\$ '),
+                          labelText: 'Preço',
+                          hintText: 'Ex: R\$ 10',
+                          prefixText: 'R\$ '),
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||
@@ -113,28 +124,31 @@ class _WalletForm extends State<WalletForm> {
                         widget.asset.price = double.parse(newValue ?? '0.0');
                       }),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final form = _formKey.currentState;
-                          if (form!.validate()) {
-                            form.save();
-                            String msg = '';
-                            if (isUpdate) {
-                              msg = 'Ativo atualizado.';
-                            } else {
-                              msg = 'Ativo adicionado à carteira.';
+                    Container(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final form = _formKey.currentState;
+                            if (form!.validate()) {
+                              form.save();
+                              String msg = '';
+                              if (isUpdate) {
+                                msg = 'Ativo atualizado.';
+                              } else {
+                                msg = 'Ativo adicionado à carteira.';
+                              }
+                              Navigator.pop(context, widget.asset);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(msg)),
+                              );
                             }
-                            Navigator.pop(context, widget.asset);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(msg)),
-                            );
-                          }
-                        },
-                        child: Text(isUpdate ? 'Salvar' : 'Adicionar'),
+                          },
+                          child: Text(isUpdate ? 'Salvar' : 'Adicionar'),
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 )),
           ),
