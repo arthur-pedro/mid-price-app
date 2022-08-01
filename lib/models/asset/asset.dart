@@ -1,12 +1,12 @@
-import 'package:midpriceapp/database/asset/asset_bo.dart';
-import 'package:midpriceapp/models/category/asset_brl_etf_category.dart';
-import 'package:midpriceapp/models/category/asset_brl_fii_category.dart';
-import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
-import 'package:midpriceapp/models/category/asset_category.dart';
-import 'package:midpriceapp/models/category/asset_cdb_category.dart';
-import 'package:midpriceapp/models/category/asset_others_category.dart';
-import 'package:midpriceapp/models/category/asset_treasure_category%20copy.dart';
-import 'package:midpriceapp/util/parser.dart';
+import 'package:midprice/database/asset/asset_bo.dart';
+import 'package:midprice/models/category/asset_brl_etf_category.dart';
+import 'package:midprice/models/category/asset_brl_fii_category.dart';
+import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_cdb_category.dart';
+import 'package:midprice/models/category/asset_others_category.dart';
+import 'package:midprice/models/category/asset_treasure_category%20copy.dart';
+import 'package:midprice/util/parser.dart';
 
 class Asset {
   @override

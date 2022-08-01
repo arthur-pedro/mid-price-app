@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:midpriceapp/models/category/asset_brl_etf_category.dart';
-import 'package:midpriceapp/models/category/asset_brl_fii_category.dart';
-import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
-import 'package:midpriceapp/models/category/asset_category.dart';
-import 'package:midpriceapp/models/category/asset_cdb_category.dart';
-import 'package:midpriceapp/models/category/asset_others_category.dart';
-import 'package:midpriceapp/models/category/asset_treasure_category%20copy.dart';
+import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/models/category/asset_brl_etf_category.dart';
+import 'package:midprice/models/category/asset_brl_fii_category.dart';
+import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_cdb_category.dart';
+import 'package:midprice/models/category/asset_others_category.dart';
+import 'package:midprice/models/category/asset_treasure_category%20copy.dart';
 
 class WalletForm extends StatefulWidget {
   Asset asset = Asset(name: '', price: 0, category: AssetBrlStockCategory());

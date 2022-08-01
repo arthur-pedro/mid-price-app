@@ -1,4 +1,4 @@
-package com.example.midpriceapp
+package com.rebalance.midprice
 
 import io.flutter.embedding.android.FlutterActivity
 

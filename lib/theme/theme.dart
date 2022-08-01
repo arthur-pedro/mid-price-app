@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/theme/pallete.dart';
+import 'package:midprice/theme/pallete.dart';
 
 class CustomTheme {
   BuildContext context;

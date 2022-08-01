@@ -1,10 +1,10 @@
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/adMob/google_ad_mob_handler.dart';
-import 'package:midpriceapp/database/asset/asset_repository.dart';
-import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
-import 'package:midpriceapp/pages/form/wallet_form_page.dart';
+import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/database/asset/asset_repository.dart';
+import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/pages/form/wallet_form_page.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);

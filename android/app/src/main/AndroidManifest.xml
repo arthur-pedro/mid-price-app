@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.midpriceapp">
+    package="com.rebalance.midprice">
    <application
         android:label="Rebalance - Preço Médio"
         android:name="${applicationName}"
@@ -34,7 +34,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
     </application>
-    
+
     <queries>
         <!-- If your app checks for SMS support -->
         <intent>

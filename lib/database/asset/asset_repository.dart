@@ -1,9 +1,9 @@
-import 'package:midpriceapp/database/db_provider.dart';
+import 'package:midprice/database/db_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:midpriceapp/database/asset/asset_bo.dart';
-import 'package:midpriceapp/database/generic_repository.dart';
-import 'package:midpriceapp/models/asset/asset.dart';
+import 'package:midprice/database/asset/asset_bo.dart';
+import 'package:midprice/database/generic_repository.dart';
+import 'package:midprice/models/asset/asset.dart';
 
 class AssetRepository extends DBProvider implements GenericRepository<Asset> {
   static final AssetRepository instance = AssetRepository._init();

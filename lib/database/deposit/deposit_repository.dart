@@ -1,8 +1,8 @@
-import 'package:midpriceapp/database/asset/asset_bo.dart';
-import 'package:midpriceapp/database/db_provider.dart';
-import 'package:midpriceapp/database/deposit/deposit_bo.dart';
-import 'package:midpriceapp/database/generic_repository.dart';
-import 'package:midpriceapp/models/deposit/deposit.dart';
+import 'package:midprice/database/asset/asset_bo.dart';
+import 'package:midprice/database/db_provider.dart';
+import 'package:midprice/database/deposit/deposit_bo.dart';
+import 'package:midprice/database/generic_repository.dart';
+import 'package:midprice/models/deposit/deposit.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 

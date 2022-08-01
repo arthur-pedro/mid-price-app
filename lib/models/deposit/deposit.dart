@@ -1,6 +1,6 @@
-import 'package:midpriceapp/database/deposit/deposit_bo.dart';
-import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:midpriceapp/util/parser.dart';
+import 'package:midprice/database/deposit/deposit_bo.dart';
+import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/util/parser.dart';
 
 class Deposit {
   int? id;

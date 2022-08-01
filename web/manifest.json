@@ -1,6 +1,6 @@
 {
-    "name": "midpriceapp",
-    "short_name": "midpriceapp",
+    "name": "midprice",
+    "short_name": "midprice",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,15 +1,15 @@
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:midpriceapp/adMob/google_ad_mob_handler.dart';
-import 'package:midpriceapp/database/asset/asset_repository.dart';
-import 'package:midpriceapp/database/deposit/deposit_repository.dart';
-import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:midpriceapp/models/category/asset_brl_stock_category.dart';
-import 'package:midpriceapp/models/deposit/deposit.dart';
-import 'package:midpriceapp/pages/form/deposit_form_page.dart';
-import 'package:midpriceapp/pages/form/wallet_form_page.dart';
-import 'package:midpriceapp/util/timeago_custom_message.dart';
+import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/database/asset/asset_repository.dart';
+import 'package:midprice/database/deposit/deposit_repository.dart';
+import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/models/deposit/deposit.dart';
+import 'package:midprice/pages/form/deposit_form_page.dart';
+import 'package:midprice/pages/form/wallet_form_page.dart';
+import 'package:midprice/util/timeago_custom_message.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DepositPage extends StatefulWidget {

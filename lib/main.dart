@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/adMob/google_ad_mob_handler.dart';
-import 'package:midpriceapp/database/db_provider.dart';
-import 'package:midpriceapp/pages/about_page.dart';
-import 'package:midpriceapp/pages/deposit_page.dart';
-import 'package:midpriceapp/pages/mid_price_page.dart';
-import 'package:midpriceapp/pages/wallet_page.dart';
+import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/database/db_provider.dart';
+import 'package:midprice/pages/about_page.dart';
+import 'package:midprice/pages/deposit_page.dart';
+import 'package:midprice/pages/mid_price_page.dart';
+import 'package:midprice/pages/wallet_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:midpriceapp/theme/theme.dart';
+import 'package:midprice/theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {

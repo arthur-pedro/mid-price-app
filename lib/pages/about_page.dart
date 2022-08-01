@@ -1,6 +1,6 @@
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:midpriceapp/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/adMob/google_ad_mob_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

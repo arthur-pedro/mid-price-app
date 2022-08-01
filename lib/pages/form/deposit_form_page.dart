@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:midpriceapp/database/asset/asset_repository.dart';
-import 'package:midpriceapp/models/asset/asset.dart';
-import 'package:midpriceapp/models/deposit/deposit.dart';
+import 'package:midprice/database/asset/asset_repository.dart';
+import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/models/deposit/deposit.dart';
 
 // ignore: must_be_immutable
 class DepositForm extends StatefulWidget {

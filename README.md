@@ -1,4 +1,4 @@
-# midpriceapp
+# midprice
 
 A new Flutter project.
 
