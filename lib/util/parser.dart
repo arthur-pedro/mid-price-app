@@ -26,4 +26,15 @@ abstract class Parser {
     DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     return dateFormat.format(millisecondsToDate(milliseconds));
   }
+
+  static bool intToBool(int value) {
+    if (value != 0 && value != 1) {
+      throw Exception('Erro ao realizar o parse do valor: ${value.toString()}');
+    }
+    return value == 1 ? true : false;
+  }
+
+  static int boolToInt(bool value) {
+    return value ? 1 : 0;
+  }
 }

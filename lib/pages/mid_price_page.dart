@@ -1,15 +1,12 @@
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/ads/unity_ads_handler.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
+import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
 import 'package:midprice/models/asset/asset.dart';
-import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
-import 'package:midprice/pages/form/wallet_form_page.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 class MidPricePage extends StatefulWidget {
   const MidPricePage({Key? key}) : super(key: key);
@@ -26,6 +23,12 @@ class _MidPricePage extends State<MidPricePage> {
   bool isLoading = false;
   int yearFilter = DateTime.now().year;
   List<int> yearList = [];
+  late Config config;
+  bool showTips = true;
+  bool showDetails = false;
+  String totalAported = '0.0';
+  int totalBuyed = 0;
+  int totalSelled = 0;
 
   @override
   void initState() {
@@ -40,9 +43,45 @@ class _MidPricePage extends State<MidPricePage> {
     wallet = await AssetRepository.instance.list();
     deposits = await DepositRepository.instance.list();
     yearList = deposits.map((deposit) => deposit.date.year).toList();
+    config = await ConfigRepository.instance.get(1);
+    totalAported = getDetails();
+    calculateLvl();
     setState(() {
       isLoading = false;
     });
+  }
+
+  String getDetails() {
+    var total = 0.0;
+    for (var i = 0; i < deposits.length; i++) {
+      final deposit = deposits[i];
+      if (deposit.operation == 'Compra') {
+        totalBuyed++;
+        total += (deposit.payedValue * deposit.quantity) + deposit.fee;
+      }
+      if (deposit.operation == 'Venda') {
+        totalSelled++;
+        total -= (deposit.payedValue * deposit.quantity) + deposit.fee;
+      }
+    }
+    return total.toStringAsFixed(2);
+  }
+
+  void calculateLvl() async {
+    var totalAssets = wallet.length;
+    var totalDeposits = deposits.length;
+    const assetWeight = 0.8;
+    const depositWeight = 0.2;
+    var currentLvl =
+        (((totalAssets * assetWeight) + (totalDeposits * depositWeight)) /
+                (assetWeight + depositWeight))
+            .floor()
+            .abs();
+    if (currentLvl < 1) {
+      currentLvl = 1;
+    }
+    config.lvl = currentLvl;
+    await ConfigRepository.instance.update(config);
   }
 
   @override
@@ -55,30 +94,10 @@ class _MidPricePage extends State<MidPricePage> {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            const Text('Sua carteira esta vazia.'),
-            const Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => WalletForm(
-            //             asset: Asset(
-            //                 name: '',
-            //                 price: 0.0,
-            //                 category: AssetBrlStockCategory())),
-            //       ),
-            //     ).then((value) => {
-            //           if (value != null)
-            //             setState(() {
-            //               wallet.add(value);
-            //             }),
-            //         });
-            //   },
-            //   child: const Text('Adicionar'),
-            // )
+          children: const [
+            Icon(Icons.search_off_outlined, color: Colors.blueGrey),
+            Text('Sua carteira esta vazia.'),
+            Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
           ],
         ),
       ),
@@ -91,6 +110,106 @@ class _MidPricePage extends State<MidPricePage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
+        !showTips
+            ? const SizedBox.shrink()
+            : Card(
+                margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                      leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.auto_awesome,
+                              color: Colors.teal,
+                            ),
+                            Text(
+                              'Lvl: ${config.lvl}',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          ]),
+                      title: const Text('Aporte! Aporte! Aporte!'),
+                      subtitle: const Text(
+                          'Assistir anúncios aumentará seus limites de aportes e quantidade de ativos na carteira.'),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          child: const Text('FECHAR'),
+                          onPressed: () {
+                            setState(() {
+                              showTips = false;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton(
+                          child: const Text('DETALHAR'),
+                          onPressed: () {
+                            setState(() {
+                              showDetails = true;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+        !showDetails
+            ? const SizedBox.shrink()
+            : Card(
+                margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(
+                        Icons.trending_up_outlined,
+                        color: Colors.teal,
+                      ),
+                      title: Text('Total Investido R\$ $totalAported'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
+                          Text(
+                              '${deposits.length} aportes realizado(s), ${wallet.length} ativo(s) cadastrado(s).'),
+                          const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
+                          Text(
+                              'Seu limite de ativos é ${config.assetQuantityLimit} podendo realizar até ${config.depositQuantityLimit} aportes'),
+                          const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
+                          Text(
+                              'Você já realizou $totalBuyed ${totalBuyed == 1 ? 'operação' : 'operações'} de compra e $totalSelled ${totalSelled == 1 ? 'operação' : 'operações'} de venda'),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          child: const Text('FECHAR'),
+                          onPressed: () {
+                            setState(() {
+                              showDetails = false;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
         Expanded(
             child: SizedBox(
                 height: 200.0,
@@ -115,8 +234,6 @@ class _MidPricePage extends State<MidPricePage> {
                           height: 0,
                         ),
                     itemCount: wallet.length))),
-        Container(
-            child: GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
       ],
     ));
   }

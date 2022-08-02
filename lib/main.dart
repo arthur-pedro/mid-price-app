@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/ads/unity_ads_handler.dart';
 import 'package:midprice/database/db_provider.dart';
 import 'package:midprice/pages/about_page.dart';
 import 'package:midprice/pages/deposit_page.dart';
@@ -14,20 +13,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  Admob.initialize(testDeviceIds: [getAppId()]);
-  runApp(
-      //   MultiProvider(
-      //   providers: [
-      //     ChangeNotifierProvider(create: (context) => AssetRepository()),
-      //   ],
-      //   child: const MyApp(),
-      // )
-      const MyApp());
+  runApp(const MyApp());
 }
-
-String getAppId() => Platform.isIOS
-    ? GoogleAdmobHandler.iosAppId
-    : GoogleAdmobHandler.androidApId;
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -39,7 +26,7 @@ class MyApp extends StatelessWidget {
 
     DBProvider();
 
-    GoogleAdmobHandler.initAdmobInterstitial();
+    UnityAdsHandler.init();
 
     return MaterialApp(
       theme: ThemeData(

@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:midprice/database/asset/asset_bo.dart';
 import 'package:midprice/database/db_provider.dart';
 import 'package:midprice/database/deposit/deposit_bo.dart';
 import 'package:midprice/database/generic_repository.dart';
+import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/deposit/deposit.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -84,5 +87,18 @@ class DepositRepository extends DBProvider
     await db.delete(tableName,
         where: '${DepositBO.id} = ?', whereArgs: [entity.id]);
     return entity;
+  }
+
+  Future<void> deleteByAsset(Asset asset) async {
+    final db = await DepositRepository.instance.database;
+    await db.delete(tableName,
+        where: '${DepositBO.asset} = ?', whereArgs: [asset.name]);
+  }
+
+  Future<bool> hasDepositByAssetId(String assetName) async {
+    final db = await DepositRepository.instance.database;
+    final result = await db.query(tableName,
+        where: '${DepositBO.asset} = ?', whereArgs: [assetName], limit: 1);
+    return result.isNotEmpty;
   }
 }

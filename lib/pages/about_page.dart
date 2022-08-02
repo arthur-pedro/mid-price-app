@@ -1,8 +1,7 @@
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/ads/unity_ads_handler.dart';
+import 'package:midprice/pages/dialog/dialog_page.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
@@ -17,6 +16,19 @@ class _AboutPage extends State<AboutPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void openThanksDialog() async {
+    final action = await ViewDialogs.yesOrNoDialog(
+        context,
+        'Aeew!!',
+        'Você está contribuindo para melhoria da platadorma. Obrigado pelo apoio! Deseja assistir outro anúncio?',
+        'Agora não',
+        'Sim! Anúncios são legais!');
+    if (action == ViewDialogsAction.yes) {
+      UnityAdsHandler.showVideoAd(
+          () => {openThanksDialog()}, () => {}, () => {});
+    }
   }
 
   @override
@@ -38,7 +50,8 @@ class _AboutPage extends State<AboutPage> {
               const Text('Ajude-nos a melhorar assistindo um anúncio.'),
               ElevatedButton(
                   onPressed: () {
-                    GoogleAdmobHandler.showInterstitial();
+                    UnityAdsHandler.showVideoAd(
+                        () => {openThanksDialog()}, () => {}, () => {});
                   },
                   child: const Text('Assistir anúncio :D')),
               const Padding(padding: EdgeInsets.fromLTRB(0, 50, 0, 0)),

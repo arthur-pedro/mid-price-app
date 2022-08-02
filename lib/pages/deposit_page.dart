@@ -1,12 +1,13 @@
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:midprice/adMob/google_ad_mob_handler.dart';
+import 'package:midprice/ads/unity_ads_handler.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
+import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
 import 'package:midprice/models/asset/asset.dart';
-import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
+import 'package:midprice/pages/dialog/dialog_page.dart';
 import 'package:midprice/pages/form/deposit_form_page.dart';
 import 'package:midprice/pages/form/wallet_form_page.dart';
 import 'package:midprice/util/timeago_custom_message.dart';
@@ -24,12 +25,20 @@ class _DepositPage extends State<DepositPage> {
 
   late List<Asset> wallet = [];
   late List<Deposit> deposits = [];
+  late Config config;
   bool isLoading = false;
+  bool showTips = true;
 
   @override
   void initState() {
     super.initState();
     refresh();
+  }
+
+  increaseDepositQuantityLimit() async {
+    config.depositQuantityLimit += config.depositLimitStep;
+    await ConfigRepository.instance.update(config);
+    setState(() {});
   }
 
   Future refresh() async {
@@ -38,6 +47,7 @@ class _DepositPage extends State<DepositPage> {
     });
     wallet = await AssetRepository.instance.list();
     deposits = await DepositRepository.instance.list();
+    config = await ConfigRepository.instance.get(1);
     setState(() {
       isLoading = false;
     });
@@ -106,23 +116,38 @@ class _DepositPage extends State<DepositPage> {
     );
   }
 
-  Route _createRouteWallet(WalletForm page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.ease;
+  showMessageDeleteSucess() {
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('O aporte foi deletado da sua carteira')));
+  }
 
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+  Future<ViewDialogsAction> openConfirmationDeleteDialog() async {
+    return await ViewDialogs.yesOrNoDialog(context, 'Confirmação',
+        'Deseja realmente excluir este aporte', 'Agora não', 'Apagar aporte');
+  }
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
+  void _navigateToForm(Deposit? depositToCreateOrEdit) {
+    Navigator.of(context)
+        .push(_createRoute(DepositForm(
+            deposit: depositToCreateOrEdit ??
+                Deposit(
+                    date: DateTime.now(),
+                    quantity: 0.0,
+                    payedValue: 0.0,
+                    operation: 'Compra',
+                    fee: 0.0))))
+        .then((asset) => {
+              if (asset != null)
+                {
+                  setState(() {
+                    if (depositToCreateOrEdit == null) {
+                      create(asset);
+                    } else {
+                      update(asset);
+                    }
+                  })
+                }
+            });
   }
 
   @override
@@ -145,28 +170,10 @@ class _DepositPage extends State<DepositPage> {
             const Text('Nenhum aporte encontrado. Faça seu primeiro aporte!'),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context)
-                    .push(_createRoute(DepositForm(
-                        deposit: Deposit(
-                            date: DateTime.now(),
-                            quantity: 0.0,
-                            payedValue: 0.0,
-                            operation: 'Compra',
-                            fee: 0.0))))
-                    .then((value) => {
-                          if (value != null)
-                            {
-                              setState(() {
-                                create(value);
-                              })
-                            },
-                        });
+                _navigateToForm(null);
               },
               child: const Text('Primeiro aporte'),
             ),
-            Container(
-                child:
-                    GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
           ],
         ),
       ),
@@ -179,6 +186,50 @@ class _DepositPage extends State<DepositPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
+            !showTips
+                ? const SizedBox.shrink()
+                : Card(
+                    margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          leading: const Icon(
+                            Icons.tips_and_updates_outlined,
+                            color: Colors.amber,
+                          ),
+                          title: Text(
+                              'Você pode fazer até ${config.depositQuantityLimit} aportes'),
+                          subtitle: const Text(
+                              'Assistir anúncios permitirá você realizar ainda mais aportes!'),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            TextButton(
+                              child: const Text('AGORA NÃO'),
+                              onPressed: () {
+                                setState(() {
+                                  showTips = false;
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            TextButton(
+                              child: const Text('ASSITIR ANÚNCIO'),
+                              onPressed: () {
+                                UnityAdsHandler.showVideoAd(
+                                    () => {increaseDepositQuantityLimit()},
+                                    () => {},
+                                    () => {});
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
             Expanded(
                 child: SizedBox(
               height: 200.0,
@@ -217,19 +268,13 @@ class _DepositPage extends State<DepositPage> {
                             Text(
                                 'R\$ ${((deposits[index].quantity * deposits[index].payedValue) + deposits[index].fee).toStringAsFixed(2)}'),
                           ]),
-                      onTap: () => {
-                        Navigator.of(context)
-                            .push(_createRoute(
-                                DepositForm(deposit: deposits[index])))
-                            .then((value) => {
-                                  if (value != null)
-                                    {
-                                      setState(() {
-                                        update(value);
-                                      })
-                                    },
-                                })
-                      },
+                      onTap: () => {_navigateToForm(deposits[index])},
+                      onLongPress: (() async {
+                        var action = await openConfirmationDeleteDialog();
+                        if (action == ViewDialogsAction.yes) {
+                          delete(deposits[index]);
+                        }
+                      }),
                     );
                   },
                   separatorBuilder: (_, ___) => const Divider(
@@ -237,33 +282,30 @@ class _DepositPage extends State<DepositPage> {
                       ),
                   itemCount: deposits.length),
             )),
-            Container(
-                child:
-                    GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => {
-            Navigator.of(context)
-                .push(_createRoute(DepositForm(
-                    deposit: Deposit(
-                        payedValue: 0,
-                        date: DateTime.now(),
-                        quantity: 0,
-                        operation: 'Compra',
-                        fee: 0.0))))
-                .then((value) => {
-                      if (value != null)
-                        {
-                          setState(() {
-                            if (deposits.isNotEmpty &&
-                                (deposits.length % 5) == 0) {
-                              GoogleAdmobHandler.showInterstitial();
-                            }
-                            create(value);
-                          })
-                        },
-                    })
+          onPressed: () async {
+            if (deposits.isNotEmpty &&
+                (deposits.length % config.depositLimitStep) == 0) {
+              final action = await ViewDialogs.yesOrNoDialog(
+                  context,
+                  'Muitos aportes!',
+                  'Você atingiu seu limite de ${config.depositQuantityLimit} '
+                      'aportes cadastrados. Assista um ancúncio para '
+                      'liberar mais ${config.assetLimitStep} espaços na carteira.',
+                  'Agora não',
+                  'Assistir anúncio');
+              if (action == ViewDialogsAction.yes) {
+                UnityAdsHandler.showVideoAd(
+                    () =>
+                        {increaseDepositQuantityLimit(), _navigateToForm(null)},
+                    () => {},
+                    () => {});
+              }
+            } else {
+              _navigateToForm(null);
+            }
           },
           tooltip: 'Novo Investimento',
           child: const Icon(Icons.add),
@@ -275,32 +317,10 @@ class _DepositPage extends State<DepositPage> {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            const Text('Sua carteira esta vazia.'),
-            const Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     Navigator.of(context)
-            //         .push(_createRouteWallet(WalletForm(
-            //             asset: Asset(
-            //                 name: '',
-            //                 price: 0.0,
-            //                 category: AssetBrlStockCategory()))))
-            //         .then((value) => {
-            //               if (value != null)
-            //                 {
-            //                   setState(() {
-            //                     createAsset(value);
-            //                   })
-            //                 },
-            //             });
-            //   },
-            //   child: const Text('Adicionar'),
-            // ),
-            Container(
-                child:
-                    GoogleAdmobHandler.getBanner(AdmobBannerSize.FULL_BANNER)),
+          children: const [
+            Icon(Icons.search_off_outlined, color: Colors.blueGrey),
+            Text('Sua carteira esta vazia.'),
+            Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
           ],
         ),
       ),
