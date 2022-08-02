@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:midprice/ads/unity_ads_handler.dart';
+import 'package:midprice/components/snackbar.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
 import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
@@ -9,7 +10,7 @@ import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/category/asset_brl_stock_category.dart';
 import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
-import 'package:midprice/pages/dialog/dialog_page.dart';
+import 'package:midprice/components/dialog.dart';
 import 'package:midprice/pages/form/wallet_form_page.dart';
 
 class WalletPage extends StatefulWidget {
@@ -81,15 +82,9 @@ class _WalletPage extends State<WalletPage> {
     await DepositRepository.instance.deleteByAsset(asset);
     await AssetRepository.instance.delete(asset);
     await refresh();
-    showMessageDeleteSucess(asset);
     setState(() {
       isLoading = false;
     });
-  }
-
-  showMessageDeleteSucess(Asset asset) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('O ativo ${asset.name} foi deletado da sua carteira')));
   }
 
   Future<ViewDialogsAction> openConfirmationDeleteDialog(Asset asset) async {
@@ -159,6 +154,10 @@ class _WalletPage extends State<WalletPage> {
     return wallet.isEmpty
         ? buildEmptyScreen(context)
         : buildList(context, wallet);
+  }
+
+  showSnackBar(String msg, ViewSnackbarStatus status) {
+    ViewSnackbar.show(context, msg, status);
   }
 
   buildEmptyScreen(BuildContext context) {
@@ -261,9 +260,15 @@ class _WalletPage extends State<WalletPage> {
                                     assets[index]);
                             if (action == ViewDialogsAction.yes) {
                               delete(assets[index]);
+                              showSnackBar(
+                                  'O ativo ${assets[index].name} foi excluído da sua carteira',
+                                  ViewSnackbarStatus.success);
                             }
                           } else {
                             delete(assets[index]);
+                            showSnackBar(
+                                'O ativo ${assets[index].name} foi excluído da sua carteira',
+                                ViewSnackbarStatus.success);
                           }
                         }
                       }),
@@ -279,7 +284,7 @@ class _WalletPage extends State<WalletPage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             if (wallet.isNotEmpty &&
-                (wallet.length % config.assetLimitStep) == 0) {
+                wallet.length >= config.assetQuantityLimit) {
               final action = await ViewDialogs.yesOrNoDialog(
                   context,
                   'Sua carteira está cheia!',

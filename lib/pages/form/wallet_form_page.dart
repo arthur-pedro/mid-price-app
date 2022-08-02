@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:midprice/components/snackbar.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/category/asset_brl_etf_category.dart';
 import 'package:midprice/models/category/asset_brl_fii_category.dart';
@@ -140,9 +141,8 @@ class _WalletForm extends State<WalletForm> {
                                 msg = 'Ativo adicionado à carteira.';
                               }
                               Navigator.pop(context, widget.asset);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(msg)),
-                              );
+                              ViewSnackbar.show(
+                                  context, msg, ViewSnackbarStatus.success);
                             }
                           },
                           child: Text(isUpdate ? 'Salvar' : 'Adicionar'),

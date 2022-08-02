@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:midprice/ads/unity_ads_handler.dart';
-import 'package:midprice/pages/dialog/dialog_page.dart';
+import 'package:midprice/components/dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatefulWidget {

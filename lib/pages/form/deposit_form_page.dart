@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:midprice/components/snackbar.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/deposit/deposit.dart';
@@ -263,9 +264,8 @@ class _DepositForm extends State<DepositForm> {
                               msg = 'Aporte adicionado à carteira.';
                             }
                             Navigator.pop(context, widget.deposit);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(msg)),
-                            );
+                            ViewSnackbar.show(
+                                context, msg, ViewSnackbarStatus.success);
                           }
                         },
                         child: Text(isUpdate ? 'Salvar' : 'Adicionar'),

@@ -9,7 +9,7 @@ class UnityAdsHandler {
   static void init() {
     UnityAds.init(
       gameId: _androIdGameId,
-      testMode: false,
+      testMode: true,
       onComplete: () {
         log('UnityAds iniciado com sucesso!');
       },

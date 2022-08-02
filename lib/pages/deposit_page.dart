@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:midprice/ads/unity_ads_handler.dart';
+import 'package:midprice/components/snackbar.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
 import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
-import 'package:midprice/pages/dialog/dialog_page.dart';
+import 'package:midprice/components/dialog.dart';
 import 'package:midprice/pages/form/deposit_form_page.dart';
 import 'package:midprice/pages/form/wallet_form_page.dart';
 import 'package:midprice/util/timeago_custom_message.dart';
@@ -116,11 +117,6 @@ class _DepositPage extends State<DepositPage> {
     );
   }
 
-  showMessageDeleteSucess() {
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('O aporte foi deletado da sua carteira')));
-  }
-
   Future<ViewDialogsAction> openConfirmationDeleteDialog() async {
     return await ViewDialogs.yesOrNoDialog(context, 'Confirmação',
         'Deseja realmente excluir este aporte', 'Agora não', 'Apagar aporte');
@@ -158,6 +154,10 @@ class _DepositPage extends State<DepositPage> {
         : deposits.isEmpty
             ? buildDepositEmptyScreen()
             : buildList();
+  }
+
+  showSnackBar(String msg, ViewSnackbarStatus status) {
+    ViewSnackbar.show(context, msg, status);
   }
 
   buildDepositEmptyScreen() {
@@ -219,9 +219,25 @@ class _DepositPage extends State<DepositPage> {
                               child: const Text('ASSITIR ANÚNCIO'),
                               onPressed: () {
                                 UnityAdsHandler.showVideoAd(
-                                    () => {increaseDepositQuantityLimit()},
-                                    () => {},
-                                    () => {});
+                                    () => {
+                                          increaseDepositQuantityLimit(),
+                                          ViewSnackbar.show(
+                                              context,
+                                              'Seu limite de aportes aumentou para ${config.depositQuantityLimit}!',
+                                              ViewSnackbarStatus.success)
+                                        },
+                                    () => {
+                                          ViewSnackbar.show(
+                                              context,
+                                              'Seu limite não aumentou porque o anúncio falhou',
+                                              ViewSnackbarStatus.error)
+                                        },
+                                    () => {
+                                          ViewSnackbar.show(
+                                              context,
+                                              'Seu limite não aumentou porque o anúncio foi pulado',
+                                              ViewSnackbarStatus.warning)
+                                        });
                               },
                             ),
                             const SizedBox(width: 8),
@@ -273,6 +289,8 @@ class _DepositPage extends State<DepositPage> {
                         var action = await openConfirmationDeleteDialog();
                         if (action == ViewDialogsAction.yes) {
                           delete(deposits[index]);
+                          showSnackBar('Aporte excluído da sua carteira',
+                              ViewSnackbarStatus.success);
                         }
                       }),
                     );
@@ -287,7 +305,7 @@ class _DepositPage extends State<DepositPage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             if (deposits.isNotEmpty &&
-                (deposits.length % config.depositLimitStep) == 0) {
+                deposits.length >= config.depositQuantityLimit) {
               final action = await ViewDialogs.yesOrNoDialog(
                   context,
                   'Muitos aportes!',
@@ -298,10 +316,25 @@ class _DepositPage extends State<DepositPage> {
                   'Assistir anúncio');
               if (action == ViewDialogsAction.yes) {
                 UnityAdsHandler.showVideoAd(
-                    () =>
-                        {increaseDepositQuantityLimit(), _navigateToForm(null)},
-                    () => {},
-                    () => {});
+                    () => {
+                          increaseDepositQuantityLimit(),
+                          ViewSnackbar.show(
+                              context,
+                              'Seu limite de aportes aumentou para ${config.depositQuantityLimit}! Agora você pode realizar mais aportes',
+                              ViewSnackbarStatus.success)
+                        },
+                    () => {
+                          ViewSnackbar.show(
+                              context,
+                              'Seu limite não aumentou porque o anúncio falhou',
+                              ViewSnackbarStatus.error)
+                        },
+                    () => {
+                          ViewSnackbar.show(
+                              context,
+                              'Seu limite não aumentou porque o anúncio foi pulado',
+                              ViewSnackbarStatus.warning)
+                        });
               }
             } else {
               _navigateToForm(null);

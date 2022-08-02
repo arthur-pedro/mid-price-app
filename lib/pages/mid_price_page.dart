@@ -6,7 +6,15 @@ import 'package:midprice/database/deposit/deposit_repository.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
+import 'package:midprice/widgets/card/mid_price_card.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
+
+class Filter {
+  bool selected;
+  String text;
+  int id;
+  Filter({required this.selected, required this.text, required this.id});
+}
 
 class MidPricePage extends StatefulWidget {
   const MidPricePage({Key? key}) : super(key: key);
@@ -21,14 +29,27 @@ class _MidPricePage extends State<MidPricePage> {
   List<Deposit> deposits = [];
   List<Asset> wallet = [];
   bool isLoading = false;
-  int yearFilter = DateTime.now().year;
-  List<int> yearList = [];
   late Config config;
   bool showTips = true;
   bool showDetails = false;
   String totalAported = '0.0';
   int totalBuyed = 0;
   int totalSelled = 0;
+
+  List<MidPriceCard> cards = [];
+
+  List<Filter> categoryFilters = [
+    Filter(selected: false, text: 'Açoes', id: 1),
+    Filter(selected: false, text: 'Fii', id: 2),
+    Filter(selected: false, text: 'CDB', id: 3),
+    Filter(selected: false, text: 'Tesouro', id: 4),
+  ];
+  List<Filter> yearFilters = [
+    Filter(selected: false, text: 'Este ano', id: 1),
+    Filter(selected: false, text: 'Último seis meses', id: 2),
+    Filter(selected: false, text: 'Este mês', id: 1),
+    Filter(selected: false, text: 'Todos', id: 4),
+  ];
 
   @override
   void initState() {
@@ -42,10 +63,17 @@ class _MidPricePage extends State<MidPricePage> {
     });
     wallet = await AssetRepository.instance.list();
     deposits = await DepositRepository.instance.list();
-    yearList = deposits.map((deposit) => deposit.date.year).toList();
+    // yearList = deposits.map((deposit) => deposit.date.year).toSet().toList();
     config = await ConfigRepository.instance.get(1);
     totalAported = getDetails();
     calculateLvl();
+    for (var index = 0; index < wallet.length; index++) {
+      cards.add(MidPriceCard(
+          midPice: getMidprice(wallet[index], true),
+          midPriceIndicator: getMidpriceIndicator(wallet[index]),
+          assetPrice: wallet[index].price.toString(),
+          assetName: wallet[index].name));
+    }
     setState(() {
       isLoading = false;
     });
@@ -106,10 +134,10 @@ class _MidPricePage extends State<MidPricePage> {
 
   buildList() {
     return Scaffold(
-        body: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
+        body: SingleChildScrollView(
+      controller: ScrollController(keepScrollOffset: false),
+      scrollDirection: Axis.vertical,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         !showTips
             ? const SizedBox.shrink()
             : Card(
@@ -210,31 +238,8 @@ class _MidPricePage extends State<MidPricePage> {
                   ],
                 ),
               ),
-        Expanded(
-            child: SizedBox(
-                height: 200.0,
-                child: ListView.separated(
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        contentPadding: const EdgeInsets.all(10),
-                        minLeadingWidth: 20,
-                        leading: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              getMidpriceIndicator(wallet[index])
-                            ]),
-                        title: Text(wallet[index].name),
-                        subtitle:
-                            Text('Preço atual R\$ ${wallet[index].price}'),
-                        trailing: Text(getMidprice(wallet[index], true)),
-                        onTap: () => {},
-                      );
-                    },
-                    separatorBuilder: (_, ___) => const Divider(
-                          height: 0,
-                        ),
-                    itemCount: wallet.length))),
-      ],
+        ...cards
+      ]),
     ));
   }
 
