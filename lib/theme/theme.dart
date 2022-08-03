@@ -11,6 +11,12 @@ class CustomTheme {
         .apply(bodyColor: Colors.blueGrey, fontFamily: 'NunitoRegular');
   }
 
+  AppBarTheme appBarTheme() {
+    return const AppBarTheme(
+        backgroundColor: Colors.grey,
+        titleTextStyle: TextStyle(color: Colors.indigo));
+  }
+
   TabBarTheme tabBarTheme() {
     return const TabBarTheme(labelColor: Colors.white);
   }

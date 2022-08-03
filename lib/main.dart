@@ -82,7 +82,7 @@ class _TabPagePageState extends State<TabPage> {
         child: Scaffold(
           appBar: AppBar(
             titleSpacing: 10,
-            elevation: 5,
+            elevation: 0,
             leadingWidth: 45,
             leading: Container(
               padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),

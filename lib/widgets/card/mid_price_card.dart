@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:midprice/models/category/asset_category.dart';
 
 class MidPriceCard extends StatelessWidget {
   String assetName;
   String assetPrice;
   String midPice;
   Icon midPriceIndicator;
+  AssetCategory assetCategory;
   MidPriceCard(
       {Key? key,
       required this.midPice,
       required this.midPriceIndicator,
       required this.assetPrice,
-      required this.assetName})
+      required this.assetName,
+      required this.assetCategory})
       : super(key: key);
 
   @override

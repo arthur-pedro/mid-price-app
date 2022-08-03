@@ -4,15 +4,37 @@ import 'package:midprice/database/asset/asset_repository.dart';
 import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
 import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/models/category/asset_brl_etf_category.dart';
+import 'package:midprice/models/category/asset_brl_fii_category.dart';
+import 'package:midprice/models/category/asset_brl_stock_category.dart';
+import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_cdb_category.dart';
+import 'package:midprice/models/category/asset_treasure_category%20copy.dart';
 import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
+import 'package:midprice/theme/pallete.dart';
+import 'package:midprice/util/lvl_messages.dart';
 import 'package:midprice/widgets/card/mid_price_card.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
+
+class CategoryFilter {
+  bool selected;
+  AssetCategory category;
+  int id;
+  CategoryFilter(
+      {required this.selected, required this.category, required this.id});
+}
+
+enum PeriodFilter {
+  today,
+  monthly,
+  yearly,
+}
 
 class Filter {
   bool selected;
   String text;
-  int id;
+  PeriodFilter id;
   Filter({required this.selected, required this.text, required this.id});
 }
 
@@ -35,20 +57,22 @@ class _MidPricePage extends State<MidPricePage> {
   String totalAported = '0.0';
   int totalBuyed = 0;
   int totalSelled = 0;
+  String tip = LvlUtil.randomTip();
 
   List<MidPriceCard> cards = [];
 
-  List<Filter> categoryFilters = [
-    Filter(selected: false, text: 'Açoes', id: 1),
-    Filter(selected: false, text: 'Fii', id: 2),
-    Filter(selected: false, text: 'CDB', id: 3),
-    Filter(selected: false, text: 'Tesouro', id: 4),
+  List<CategoryFilter> categoryFilters = [
+    CategoryFilter(selected: false, category: AssetBrlStockCategory(), id: 1),
+    CategoryFilter(selected: false, category: AssetBrlFiiCategory(), id: 2),
+    CategoryFilter(selected: false, category: AssetCdbCategory(), id: 3),
+    CategoryFilter(selected: false, category: AssetTreasureCategory(), id: 4),
+    CategoryFilter(selected: false, category: AssetBrlFiiCategory(), id: 4),
+    CategoryFilter(selected: false, category: AssetBrlEtfCategory(), id: 5),
   ];
-  List<Filter> yearFilters = [
-    Filter(selected: false, text: 'Este ano', id: 1),
-    Filter(selected: false, text: 'Último seis meses', id: 2),
-    Filter(selected: false, text: 'Este mês', id: 1),
-    Filter(selected: false, text: 'Todos', id: 4),
+  List<Filter> periodFilter = [
+    Filter(selected: false, text: 'Este ano', id: PeriodFilter.yearly),
+    Filter(selected: false, text: 'Este mês', id: PeriodFilter.monthly),
+    Filter(selected: false, text: 'Hoje', id: PeriodFilter.today),
   ];
 
   @override
@@ -72,6 +96,7 @@ class _MidPricePage extends State<MidPricePage> {
           midPice: getMidprice(wallet[index], true),
           midPriceIndicator: getMidpriceIndicator(wallet[index]),
           assetPrice: wallet[index].price.toString(),
+          assetCategory: wallet[index].category,
           assetName: wallet[index].name));
     }
     setState(() {
@@ -141,7 +166,7 @@ class _MidPricePage extends State<MidPricePage> {
         !showTips
             ? const SizedBox.shrink()
             : Card(
-                margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                margin: const EdgeInsets.fromLTRB(10, 20, 10, 0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -160,21 +185,21 @@ class _MidPricePage extends State<MidPricePage> {
                                   const TextStyle(fontWeight: FontWeight.bold),
                             )
                           ]),
-                      title: const Text('Aporte! Aporte! Aporte!'),
+                      title: Text(tip),
                       subtitle: const Text(
                           'Assistir anúncios aumentará seus limites de aportes e quantidade de ativos na carteira.'),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        TextButton(
-                          child: const Text('FECHAR'),
-                          onPressed: () {
-                            setState(() {
-                              showTips = false;
-                            });
-                          },
-                        ),
+                        // TextButton(
+                        //   child: const Text('FECHAR'),
+                        //   onPressed: () {
+                        //     setState(() {
+                        //       showTips = false;
+                        //     });
+                        //   },
+                        // ),
                         const SizedBox(width: 8),
                         TextButton(
                           child: const Text('DETALHAR'),
@@ -193,7 +218,7 @@ class _MidPricePage extends State<MidPricePage> {
         !showDetails
             ? const SizedBox.shrink()
             : Card(
-                margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                margin: const EdgeInsets.fromLTRB(10, 20, 10, 0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -238,9 +263,130 @@ class _MidPricePage extends State<MidPricePage> {
                   ],
                 ),
               ),
-        ...cards
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 15, 0),
+          child: Wrap(
+            spacing: 5,
+            children: List<Widget>.generate(
+              periodFilter.length,
+              (int idx) {
+                return ChoiceChip(
+                    selectedColor: Colors.teal,
+                    backgroundColor: Colors.white,
+                    elevation: 2,
+                    selectedShadowColor: Colors.grey,
+                    label: Text(
+                      periodFilter[idx].text,
+                      style: TextStyle(
+                          color: periodFilter[idx].selected
+                              ? Colors.white
+                              : Colors.grey),
+                    ),
+                    selected: periodFilter[idx].selected == true,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        for (var i = 0; i < periodFilter.length; i++) {
+                          periodFilter[i].selected = false;
+                        }
+                        periodFilter[idx].selected = selected;
+                      });
+                    });
+              },
+            ).toList(),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 15, 10),
+          child: Wrap(
+            spacing: 5,
+            children: List<Widget>.generate(
+              categoryFilters.length,
+              (int idx) {
+                return ChoiceChip(
+                    selectedColor: Palette.blue.shade800,
+                    backgroundColor: Colors.white,
+                    elevation: 2,
+                    selectedShadowColor: Colors.grey,
+                    label: Text(
+                      categoryFilters[idx].category.shortName,
+                      style: TextStyle(
+                          color: categoryFilters[idx].selected
+                              ? Colors.white
+                              : Colors.grey),
+                    ),
+                    selected: categoryFilters[idx].selected == true,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        categoryFilters[idx].selected =
+                            !categoryFilters[idx].selected;
+                      });
+                    });
+              },
+            ).toList(),
+          ),
+        ),
+        ...getCards()
       ]),
     ));
+  }
+
+  List<MidPriceCard> getCards() {
+    List<String> selectedCategoryFilters = categoryFilters
+        .where((category) => category.selected)
+        .map((category) => category.category.name)
+        .toList();
+    List<MidPriceCard> filtredCards = cards
+        .where(
+            (card) => selectedCategoryFilters.contains(card.assetCategory.name))
+        .toList();
+    List<PeriodFilter> selectedPeriodFilters = periodFilter
+        .where((period) => period.selected)
+        .map((period) => period.id)
+        .toList();
+
+    List<MidPriceCard> result =
+        selectedCategoryFilters.isNotEmpty ? filtredCards : cards;
+
+    DateTime today = DateTime(2022, 8, 2, 8, 0, 0);
+    for (var i = 0; i < selectedPeriodFilters.length; i++) {
+      switch (selectedPeriodFilters[i]) {
+        case PeriodFilter.today:
+          List<String> filtredDeposits = deposits
+              .where((deposit) =>
+                  deposit.date.year == today.year &&
+                  deposit.date.month == today.month &&
+                  deposit.date.day == today.day)
+              .map((e) => e.asset!.name)
+              .toList();
+          result = result
+              .where((card) => filtredDeposits.contains(card.assetName))
+              .toList();
+          break;
+        case PeriodFilter.monthly:
+          List<String> filtredDeposits = deposits
+              .where((deposit) =>
+                  deposit.date.year == today.year &&
+                  deposit.date.month == today.month)
+              .map((e) => e.asset!.name)
+              .toList();
+          result = result
+              .where((card) => filtredDeposits.contains(card.assetName))
+              .toList();
+          break;
+        case PeriodFilter.yearly:
+          List<String> filtredDeposits = deposits
+              .where((deposit) => deposit.date.year == today.year)
+              .map((e) => e.asset!.name)
+              .toList();
+          result = result
+              .where((card) => filtredDeposits.contains(card.assetName))
+              .toList();
+          break;
+        default:
+      }
+    }
+
+    return result;
   }
 
   String getMidprice(Asset asset, bool mask) {
