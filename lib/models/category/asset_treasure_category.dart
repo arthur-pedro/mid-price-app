@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_category_id.dart';
+import 'package:midprice/models/category/asset_category_name.dart';
+import 'package:midprice/models/category/asset_category_short_name.dart';
 
 class AssetTreasureCategory implements AssetCategory {
   @override
@@ -10,13 +13,13 @@ class AssetTreasureCategory implements AssetCategory {
   int get hashCode => name.hashCode;
 
   @override
-  String id = 'TESOURO_DIRETO';
+  AssetCategoryId id = AssetCategoryId.treasure;
 
   @override
-  String shortName = 'Tesouro Direto';
+  AssetCategoryShortName shortName = AssetCategoryShortName.treasureShortName;
 
   @override
-  String name = 'Tesouro Direto';
+  AssetCategoryName name = AssetCategoryName.treasureName;
 
   @override
   Icon icon = const Icon(

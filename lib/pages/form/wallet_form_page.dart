@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:midprice/components/snackbar.dart';
+import 'package:midprice/locale/locale_static_message.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/category/asset_brl_etf_category.dart';
 import 'package:midprice/models/category/asset_brl_fii_category.dart';
 import 'package:midprice/models/category/asset_brl_stock_category.dart';
 import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_category_list.dart';
 import 'package:midprice/models/category/asset_cdb_category.dart';
 import 'package:midprice/models/category/asset_others_category.dart';
-import 'package:midprice/models/category/asset_treasure_category%20copy.dart';
+import 'package:midprice/models/category/asset_treasure_category.dart';
+import 'package:midprice/locale/app_localizations_context.dart';
+import 'package:midprice/models/category/asset_usd_etf_category.dart';
+import 'package:midprice/models/category/asset_usd_fii_category.dart';
+import 'package:midprice/models/category/asset_usd_stock_category.dart';
 
 class WalletForm extends StatefulWidget {
   Asset asset = Asset(name: '', price: 0, category: AssetBrlStockCategory());
@@ -21,29 +27,27 @@ class WalletForm extends StatefulWidget {
 }
 
 class _WalletForm extends State<WalletForm> {
-  String title = 'Novo Ativo';
+  String title = '';
 
   final _formKey = GlobalKey<FormState>();
 
-  final List<AssetCategory> _categories = [
-    AssetBrlStockCategory(),
-    AssetBrlFiiCategory(),
-    AssetTreasureCategory(),
-    AssetCdbCategory(),
-    AssetBrlEtfCategory(),
-    AssetOtherCategory(),
-  ];
+  List<AssetCategory> _categories = [];
 
   @override
   Widget build(BuildContext context) {
     bool isUpdate = false;
     if (widget.asset.id != null) {
       isUpdate = true;
-      title = 'Atualização de ativo';
+      title = context.loc.attTicker;
+    } else {
+      title = context.loc.addTicker;
     }
+
+    _categories = AssetCategoryList.all();
 
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Text(title),
         ),
         body: SingleChildScrollView(
@@ -62,7 +66,7 @@ class _WalletForm extends State<WalletForm> {
                           labelText: 'Ticker', hintText: 'Ex: ITSA4'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Campo obrigatório';
+                          return context.loc.requiredField;
                         }
                         return null;
                       },
@@ -74,7 +78,8 @@ class _WalletForm extends State<WalletForm> {
                       value: widget.asset.category,
                       selectedItemBuilder: (BuildContext context) {
                         return _categories.map<Widget>((AssetCategory item) {
-                          return Text(item.name);
+                          return Text(LocaleStaticMessage.translate(
+                              context.loc.localeName, item.name.name));
                         }).toList();
                       },
                       isExpanded: true,
@@ -92,7 +97,8 @@ class _WalletForm extends State<WalletForm> {
                           (AssetCategory value) {
                         return DropdownMenuItem<AssetCategory>(
                           value: value,
-                          child: Text(value.name),
+                          child: Text(LocaleStaticMessage.translate(
+                              context.loc.localeName, value.name.name)),
                         );
                       }).toList(),
                     ),
@@ -109,15 +115,15 @@ class _WalletForm extends State<WalletForm> {
                           ),
                         ),
                       ],
-                      decoration: const InputDecoration(
-                          labelText: 'Preço',
-                          hintText: 'Ex: R\$ 10',
-                          prefixText: 'R\$ '),
+                      decoration: InputDecoration(
+                          labelText: context.loc.price,
+                          hintText: 'Ex: ${context.loc.currency} 10',
+                          prefixText: '${context.loc.currency} '),
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||
                             double.parse(value) < 0) {
-                          return 'Campo obrigatório';
+                          return context.loc.requiredField;
                         }
                         return null;
                       },
@@ -136,16 +142,17 @@ class _WalletForm extends State<WalletForm> {
                               form.save();
                               String msg = '';
                               if (isUpdate) {
-                                msg = 'Ativo atualizado.';
+                                msg = context.loc.updatedTicker;
                               } else {
-                                msg = 'Ativo adicionado à carteira.';
+                                msg = context.loc.addedTickerToWallet;
                               }
                               Navigator.pop(context, widget.asset);
                               ViewSnackbar.show(
                                   context, msg, ViewSnackbarStatus.success);
                             }
                           },
-                          child: Text(isUpdate ? 'Salvar' : 'Adicionar'),
+                          child: Text(
+                              isUpdate ? context.loc.save : context.loc.add),
                         ),
                       ),
                     )

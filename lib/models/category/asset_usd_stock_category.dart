@@ -4,27 +4,27 @@ import 'package:midprice/models/category/asset_category_id.dart';
 import 'package:midprice/models/category/asset_category_name.dart';
 import 'package:midprice/models/category/asset_category_short_name.dart';
 
-class AssetCdbCategory implements AssetCategory {
+class AssetUsdStockCategory implements AssetCategory {
   @override
   bool operator ==(Object other) =>
-      other is AssetCdbCategory && other.name == name;
+      other is AssetUsdStockCategory && other.name == name;
 
   @override
   int get hashCode => name.hashCode;
 
   @override
-  AssetCategoryId id = AssetCategoryId.cdb;
+  AssetCategoryId id = AssetCategoryId.usdStock;
 
   @override
-  AssetCategoryShortName shortName = AssetCategoryShortName.cdbShortName;
+  AssetCategoryName name = AssetCategoryName.usdStockName;
 
   @override
-  AssetCategoryName name = AssetCategoryName.cdbName;
+  AssetCategoryShortName shortName = AssetCategoryShortName.usdStockShortName;
 
   @override
   Icon icon = const Icon(
-    Icons.account_balance_outlined,
+    Icons.monetization_on,
     size: 16,
-    color: Colors.amber,
+    color: Colors.teal,
   );
 }

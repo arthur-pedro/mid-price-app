@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:midprice/models/category/asset_category_id.dart';
+import 'package:midprice/models/category/asset_category_name.dart';
+import 'package:midprice/models/category/asset_category_short_name.dart';
 
 abstract class AssetCategory {
-  String id;
+  AssetCategoryId id;
 
-  String shortName;
+  AssetCategoryShortName shortName;
 
-  String name;
+  AssetCategoryName name;
 
   Icon icon;
 

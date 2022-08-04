@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/locale/app_localizations_context.dart';
 
 class MidPriceCard extends StatelessWidget {
   String assetName;
@@ -19,16 +20,19 @@ class MidPriceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      margin: const EdgeInsets.fromLTRB(10, 0, 10, 20),
       child: ListTile(
         contentPadding: const EdgeInsets.all(10),
         minLeadingWidth: 20,
         leading: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[midPriceIndicator]),
-        title: Text(assetName),
-        subtitle: Text('Preço atual R\$ $assetPrice'),
-        trailing: Text(midPice),
+        title: Text(
+          assetName,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(context.loc.currentAssetPrice(assetPrice)),
+        trailing: Text('${context.loc.pm} $midPice'),
         onTap: () => {},
       ),
     );

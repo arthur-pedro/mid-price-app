@@ -1,0 +1,209 @@
+{
+    "helloWorld": "Olá Mundo",
+    "confirmation": "Confirmação",
+    "notNow": "Agora não",
+    "deleteTicker": "Apagar ativo",
+    "realyDeleteFile": "Deseja realmente excluir o ativo {ticker}",
+    "@realyDeleteFile": {
+        "placeholders": {
+            "ticker": {
+                "type": "String",
+                "example": "ITSA4"
+            }
+        }
+    },
+    "warning": "Cuidado",
+    "deleteAnyway": "Apagar mesmo assim",
+    "foreignKeyViolationOnDeleteTicker": "Você tem aportes cadastrados para o ativo {ticker}. Excluir este ativo apagará todos os aportes",
+    "@foreignKeyViolationOnDeleteTicker": {
+        "placeholders": {
+            "ticker": {
+                "type": "String",
+                "example": "ITSA4"
+            }
+        }
+    },
+    "add": "Adicionar",
+    "emptyWalletAlert": "Sua carteira está vazia. Adicione seu primeiro ativo!",
+    "assetQuantityLimitRegister": "Você pode cadastrar até {assetQuantityLimit} ativos",
+    "@assetQuantityLimitRegister": {
+        "placeholders": {
+            "assetQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "playAddTip": "Assistir anúncios irá aumentar o tamanho da sua carteira!",
+    "playAdd": "Assistir anúncio",
+    "currency": "R$",
+    "snackDeleteMessage": "O ativo {ticker} foi excluído da sua carteira",
+    "@snackDeleteMessage": {
+        "placeholders": {
+            "ticker": {
+                "type": "String",
+                "example": "ITSA4"
+            }
+        }
+    },
+    "newDeposit": "Novo Investimento",
+    "fullWallet": "Sua carteira está cheia!",
+    "limitAddAsset": "Você atingiu seu limite de {assetQuantityLimit} ativos cadastrados. Assista um ancúncio para liberar mais {assetLimitStep} espaços na carteira.",
+    "@limitAddAsset": {
+        "placeholders": {
+            "assetQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            },
+            "assetLimitStep":  {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+   "deleteDeposit": "Apagar aporte",
+   "realyDeleteDeposit": "Deseja realmente excluir este aporte?",
+   "buy": "Compra",
+   "firstDeposit": "Primeiro aporte",
+   "emptyDeposit": "Nenhum aporte encontrado. Faça seu primeiro aporte!",
+   "playAddDepositTip": "Assistir anúncios permitirá você realizar ainda mais aportes!",
+   "depositQuantityLimitRegister": "Você pode fazer até {depositQuantityLimit} aportes",
+   "@depositQuantityLimitRegister": {
+        "placeholders": {
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "increaseDepositLimit": "Seu limite de aportes aumentou para {depositQuantityLimit}!",
+    "@increaseDepositLimit": {
+        "placeholders": {
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "addFailedError": "Seu limite não aumentou porque o anúncio falhou",
+    "addSkipedError": "Seu limite não aumentou porque o anúncio foi pulado",
+    "emptyShortWalletAlert": "Sua carteura esta vazia.",
+    "emptyShortWalletAlertComplement": "Adicione seu primeiro ativo na aba \"CARTEIRA\".",
+    "wallet": "Carteira",
+    "midPrice": "Preço médio",
+    "contribution": "Aporte",
+    "currentAssetPrice": "Preço atual R$ {assetPrice}",
+    "@currentAssetPrice": {
+        "placeholders": {
+            "assetPrice": {
+                "type": "String",
+                "example": "2"
+            }
+        }
+    },
+    "pm": "PM",
+    "total": "Total",
+    "units": "unidades a",
+    "deletedAssetFromWallet": "Aporte excluído da sua carteira",
+    "increaseDepositLimit": "Seu limite de aportes aumentou para {depositQuantityLimit}! Agora você pode realizar mais aportes",
+    "@increaseDepositLimit": {
+        "placeholders": {
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "soManyContribution": "Muitos aportes!",
+    "limitAddContribution": "Você atingiu seu limite de {depositQuantityLimit} aportes cadastrados. Assista um ancúncio para liberar mais {depositLimitStep} espaços na carteira.",
+    "@limitAddContribution": {
+        "placeholders": {
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            },
+            "depositLimitStep":  {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "playAddTipGeneral": "Assistir anúncios aumentará seus limites de aportes e quantidade de ativos na carteira.",
+    "detail": "Detalhar",
+    "totalInvested": "Total Investido R$ {totalAported}",
+    "@totalInvested": {
+        "placeholders": {
+            "totalAported": {
+                "type": "String",
+                "example": "2.0"
+            }
+        }
+    },
+    "close": "Fechar",
+    "walletDetailMessage": "{deposits} aportes realizado(s) e {wallet} ativo(s) cadastrado(s).",
+    "@walletDetailMessage": {
+        "placeholders": {
+            "deposits": {
+                "type": "int",
+                "example": "2"
+            },
+            "wallet": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "walletDetailFirstComplementMessage": "Seu limite de ativos é {assetQuantityLimit} podendo realizar até {depositQuantityLimit} aportes",
+    "@walletDetailFirstComplementMessage": {
+        "placeholders": {
+            "assetQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            },
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "walletDetailSecondComplementMessage": "Você já realizou {totalBuyed} operação(ões) de compra e {totalSelled} operação(ões) de venda",
+    "@walletDetailSecondComplementMessage": {
+        "placeholders": {
+            "totalBuyed": {
+                "type": "int",
+                "example": "2"
+            },
+            "totalSelled": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "attTicker": "Atualização de ativo",
+    "addTicker": "Novo ativo",
+    "attContribution": "Atualização de aporte",
+    "addContribution": "Novo aporte",
+    "requiredField": "Campo obrigatório",
+    "price": "Preço",
+    "save": "Salvar",
+    "updatedTicker": "Ativo atualizado",
+    "addedTickerToWallet": "Ativo adicionado à carteira.",
+    "updatedContribution": "Aporte atualizado",
+    "addedContributionToWallet": "Aporte adicionado à carteira.",
+    "selectOneOperation": "Selecione uma operação",
+    "selectOneTicker": "Selecione um ativo",
+    "quantity": "Quantidade",
+    "contributionQuantity": "Quantidade do aporte",
+    "fees": "Taxas",
+    "feeDescription": "Emolumentos, Corretagem, etc...",
+    "totalCostToContribution": "Custo total to aporte",
+    "tickerValue": "Valor do ativo R$ {value}",
+    "@tickerValue": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "2"
+            }
+        }
+    }
+}

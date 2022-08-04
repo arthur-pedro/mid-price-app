@@ -1,21 +1,27 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:midprice/ads/unity_ads_handler.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
 import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
+import 'package:midprice/locale/locale_static_message.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/category/asset_brl_etf_category.dart';
 import 'package:midprice/models/category/asset_brl_fii_category.dart';
 import 'package:midprice/models/category/asset_brl_stock_category.dart';
 import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_category_list.dart';
 import 'package:midprice/models/category/asset_cdb_category.dart';
-import 'package:midprice/models/category/asset_treasure_category%20copy.dart';
+import 'package:midprice/models/category/asset_treasure_category.dart';
 import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
+import 'package:midprice/models/deposit/enum_operation.dart';
 import 'package:midprice/theme/pallete.dart';
 import 'package:midprice/util/lvl_messages.dart';
 import 'package:midprice/widgets/card/mid_price_card.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
+import 'package:midprice/locale/app_localizations_context.dart';
 
 class CategoryFilter {
   bool selected;
@@ -25,17 +31,11 @@ class CategoryFilter {
       {required this.selected, required this.category, required this.id});
 }
 
-enum PeriodFilter {
-  today,
-  monthly,
-  yearly,
-}
-
-class Filter {
+class PeriodFilter {
   bool selected;
-  String text;
-  PeriodFilter id;
-  Filter({required this.selected, required this.text, required this.id});
+  int year;
+  int? id;
+  PeriodFilter({required this.selected, required this.year, required this.id});
 }
 
 class MidPricePage extends StatefulWidget {
@@ -58,22 +58,11 @@ class _MidPricePage extends State<MidPricePage> {
   int totalBuyed = 0;
   int totalSelled = 0;
   String tip = LvlUtil.randomTip();
-
+  List<int> yearList = [];
   List<MidPriceCard> cards = [];
 
-  List<CategoryFilter> categoryFilters = [
-    CategoryFilter(selected: false, category: AssetBrlStockCategory(), id: 1),
-    CategoryFilter(selected: false, category: AssetBrlFiiCategory(), id: 2),
-    CategoryFilter(selected: false, category: AssetCdbCategory(), id: 3),
-    CategoryFilter(selected: false, category: AssetTreasureCategory(), id: 4),
-    CategoryFilter(selected: false, category: AssetBrlFiiCategory(), id: 4),
-    CategoryFilter(selected: false, category: AssetBrlEtfCategory(), id: 5),
-  ];
-  List<Filter> periodFilter = [
-    Filter(selected: false, text: 'Este ano', id: PeriodFilter.yearly),
-    Filter(selected: false, text: 'Este mês', id: PeriodFilter.monthly),
-    Filter(selected: false, text: 'Hoje', id: PeriodFilter.today),
-  ];
+  List<CategoryFilter> categoryFilters = [];
+  // List<PeriodFilter> periodFilters = [];
 
   @override
   void initState() {
@@ -87,10 +76,13 @@ class _MidPricePage extends State<MidPricePage> {
     });
     wallet = await AssetRepository.instance.list();
     deposits = await DepositRepository.instance.list();
-    // yearList = deposits.map((deposit) => deposit.date.year).toSet().toList();
+
     config = await ConfigRepository.instance.get(1);
+
     totalAported = getDetails();
+
     calculateLvl();
+
     for (var index = 0; index < wallet.length; index++) {
       cards.add(MidPriceCard(
           midPice: getMidprice(wallet[index], true),
@@ -99,6 +91,18 @@ class _MidPricePage extends State<MidPricePage> {
           assetCategory: wallet[index].category,
           assetName: wallet[index].name));
     }
+
+    for (var index = 0; index < AssetCategoryList.all().length; index++) {
+      categoryFilters.add(CategoryFilter(
+          selected: false,
+          category: AssetCategoryList.all()[index],
+          id: index));
+    }
+
+    for (var index = 0; index < deposits.length; index++) {
+      yearList.add(deposits[index].date.year);
+    }
+
     setState(() {
       isLoading = false;
     });
@@ -108,11 +112,11 @@ class _MidPricePage extends State<MidPricePage> {
     var total = 0.0;
     for (var i = 0; i < deposits.length; i++) {
       final deposit = deposits[i];
-      if (deposit.operation == 'Compra') {
+      if (deposit.operation == Operation.buy) {
         totalBuyed++;
         total += (deposit.payedValue * deposit.quantity) + deposit.fee;
       }
-      if (deposit.operation == 'Venda') {
+      if (deposit.operation == Operation.sell) {
         totalSelled++;
         total -= (deposit.payedValue * deposit.quantity) + deposit.fee;
       }
@@ -147,10 +151,10 @@ class _MidPricePage extends State<MidPricePage> {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            Text('Sua carteira esta vazia.'),
-            Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
+          children: [
+            const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
+            Text(context.loc.emptyShortWalletAlert),
+            Text(context.loc.emptyShortWalletAlertComplement),
           ],
         ),
       ),
@@ -186,23 +190,14 @@ class _MidPricePage extends State<MidPricePage> {
                             )
                           ]),
                       title: Text(tip),
-                      subtitle: const Text(
-                          'Assistir anúncios aumentará seus limites de aportes e quantidade de ativos na carteira.'),
+                      subtitle: Text(context.loc.playAddTipGeneral),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        // TextButton(
-                        //   child: const Text('FECHAR'),
-                        //   onPressed: () {
-                        //     setState(() {
-                        //       showTips = false;
-                        //     });
-                        //   },
-                        // ),
                         const SizedBox(width: 8),
                         TextButton(
-                          child: const Text('DETALHAR'),
+                          child: Text(context.loc.detail.toUpperCase()),
                           onPressed: () {
                             setState(() {
                               showDetails = true;
@@ -227,22 +222,23 @@ class _MidPricePage extends State<MidPricePage> {
                         Icons.trending_up_outlined,
                         color: Colors.teal,
                       ),
-                      title: Text('Total Investido R\$ $totalAported'),
+                      title: Text(context.loc.totalInvested(totalAported)),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Padding(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
-                          Text(
-                              '${deposits.length} aportes realizado(s), ${wallet.length} ativo(s) cadastrado(s).'),
+                          Text(context.loc.walletDetailMessage(
+                              deposits.length, wallet.length)),
                           const Padding(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
-                          Text(
-                              'Seu limite de ativos é ${config.assetQuantityLimit} podendo realizar até ${config.depositQuantityLimit} aportes'),
+                          Text(context.loc.walletDetailFirstComplementMessage(
+                              config.assetQuantityLimit,
+                              config.depositQuantityLimit)),
                           const Padding(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
-                          Text(
-                              'Você já realizou $totalBuyed ${totalBuyed == 1 ? 'operação' : 'operações'} de compra e $totalSelled ${totalSelled == 1 ? 'operação' : 'operações'} de venda'),
+                          Text(context.loc.walletDetailSecondComplementMessage(
+                              totalBuyed, totalSelled)),
                         ],
                       ),
                     ),
@@ -250,7 +246,7 @@ class _MidPricePage extends State<MidPricePage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         TextButton(
-                          child: const Text('FECHAR'),
+                          child: Text(context.loc.close.toUpperCase()),
                           onPressed: () {
                             setState(() {
                               showDetails = false;
@@ -263,135 +259,204 @@ class _MidPricePage extends State<MidPricePage> {
                   ],
                 ),
               ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 15, 0),
-          child: Wrap(
-            spacing: 5,
-            children: List<Widget>.generate(
-              periodFilter.length,
-              (int idx) {
-                return ChoiceChip(
-                    selectedColor: Colors.teal,
-                    backgroundColor: Colors.white,
-                    elevation: 2,
-                    selectedShadowColor: Colors.grey,
-                    label: Text(
-                      periodFilter[idx].text,
-                      style: TextStyle(
-                          color: periodFilter[idx].selected
-                              ? Colors.white
-                              : Colors.grey),
-                    ),
-                    selected: periodFilter[idx].selected == true,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        for (var i = 0; i < periodFilter.length; i++) {
-                          periodFilter[i].selected = false;
-                        }
-                        periodFilter[idx].selected = selected;
-                      });
-                    });
-              },
-            ).toList(),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 15, 10),
-          child: Wrap(
-            spacing: 5,
-            children: List<Widget>.generate(
-              categoryFilters.length,
-              (int idx) {
-                return ChoiceChip(
-                    selectedColor: Palette.blue.shade800,
-                    backgroundColor: Colors.white,
-                    elevation: 2,
-                    selectedShadowColor: Colors.grey,
-                    label: Text(
-                      categoryFilters[idx].category.shortName,
-                      style: TextStyle(
-                          color: categoryFilters[idx].selected
-                              ? Colors.white
-                              : Colors.grey),
-                    ),
-                    selected: categoryFilters[idx].selected == true,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        categoryFilters[idx].selected =
-                            !categoryFilters[idx].selected;
-                      });
-                    });
-              },
-            ).toList(),
-          ),
-        ),
+        SizedBox(
+            height: 70,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: getFilters(),
+            )),
         ...getCards()
       ]),
     ));
   }
 
+  void _modalBottomSheetMenu() {
+    showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        builder: (builder) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.5,
+            color: Colors.transparent,
+            child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10.0),
+                        topRight: Radius.circular(10.0))),
+                child: Center(child: getMoreFilters())),
+          );
+        });
+  }
+
+  GridView getMoreFilters() {
+    return GridView.count(
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      crossAxisCount: 2,
+      children: <Widget>[
+        Container(
+          alignment: Alignment.center,
+          child: Container(
+            width: 70,
+            height: 70,
+            child: Icon(
+              Icons.access_time_rounded,
+              color: Palette.blue.shade500,
+            ),
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.fromARGB(255, 216, 224, 242)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> getFilters() {
+    // return [getMoreFiltersChoiceChip(), getCategoryFiltersChoiceChip()]
+    //     .expand((element) => element)
+    //     .toList();
+    return [getCategoryFiltersChoiceChip()]
+        .expand((element) => element)
+        .toList();
+  }
+
+  List<Widget> getMoreFiltersChoiceChip() {
+    return List<Widget>.generate(
+      1,
+      growable: true,
+      (int idx) {
+        return Container(
+          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: ChoiceChip(
+              selectedColor: Palette.blue.shade100,
+              backgroundColor: Colors.white,
+              selectedShadowColor: Colors.grey,
+              elevation: 1,
+              label: const Text(
+                'Mais',
+                style: TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+              avatar: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.grey,
+              ),
+              selected: false,
+              onSelected: (bool selected) {
+                _modalBottomSheetMenu();
+              }),
+        );
+      },
+    ).toList();
+  }
+
+  List<Widget> getCategoryFiltersChoiceChip() {
+    return List<Widget>.generate(
+      categoryFilters.length,
+      growable: true,
+      (int idx) {
+        return Container(
+          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: ChoiceChip(
+              selectedColor: Palette.blue.shade100,
+              backgroundColor: Colors.white,
+              selectedShadowColor: Colors.grey,
+              elevation: 1,
+              label: Text(
+                LocaleStaticMessage.translate(context.loc.localeName,
+                    categoryFilters[idx].category.name.name),
+                style: TextStyle(
+                    fontSize: 11,
+                    color: categoryFilters[idx].selected
+                        ? Palette.blue.shade700
+                        : Colors.grey),
+              ),
+              selected: categoryFilters[idx].selected == true,
+              onSelected: (bool selected) {
+                setState(() {
+                  categoryFilters[idx].selected =
+                      !categoryFilters[idx].selected;
+                });
+              }),
+        );
+      },
+    ).toList();
+  }
+
   List<MidPriceCard> getCards() {
     List<String> selectedCategoryFilters = categoryFilters
         .where((category) => category.selected)
-        .map((category) => category.category.name)
+        .map((category) => category.category.name.name)
         .toList();
     List<MidPriceCard> filtredCards = cards
-        .where(
-            (card) => selectedCategoryFilters.contains(card.assetCategory.name))
+        .where((card) =>
+            selectedCategoryFilters.contains(card.assetCategory.name.name))
         .toList();
-    List<PeriodFilter> selectedPeriodFilters = periodFilter
-        .where((period) => period.selected)
-        .map((period) => period.id)
-        .toList();
+    // List<PeriodFilterEnum> selectedPeriodFilters = periodFilter
+    //     .where((period) => period.selected)
+    //     .map((period) => period.id)
+    //     .toList();
 
     List<MidPriceCard> result =
         selectedCategoryFilters.isNotEmpty ? filtredCards : cards;
 
     DateTime today = DateTime(2022, 8, 2, 8, 0, 0);
-    for (var i = 0; i < selectedPeriodFilters.length; i++) {
-      switch (selectedPeriodFilters[i]) {
-        case PeriodFilter.today:
-          List<String> filtredDeposits = deposits
-              .where((deposit) =>
-                  deposit.date.year == today.year &&
-                  deposit.date.month == today.month &&
-                  deposit.date.day == today.day)
-              .map((e) => e.asset!.name)
-              .toList();
-          result = result
-              .where((card) => filtredDeposits.contains(card.assetName))
-              .toList();
-          break;
-        case PeriodFilter.monthly:
-          List<String> filtredDeposits = deposits
-              .where((deposit) =>
-                  deposit.date.year == today.year &&
-                  deposit.date.month == today.month)
-              .map((e) => e.asset!.name)
-              .toList();
-          result = result
-              .where((card) => filtredDeposits.contains(card.assetName))
-              .toList();
-          break;
-        case PeriodFilter.yearly:
-          List<String> filtredDeposits = deposits
-              .where((deposit) => deposit.date.year == today.year)
-              .map((e) => e.asset!.name)
-              .toList();
-          result = result
-              .where((card) => filtredDeposits.contains(card.assetName))
-              .toList();
-          break;
-        default:
-      }
-    }
+    // for (var i = 0; i < selectedPeriodFilters.length; i++) {
+    //   switch (selectedPeriodFilters[i]) {
+    //     case PeriodFilterEnum.today:
+    //       List<String> filtredDeposits = deposits
+    //           .where((deposit) =>
+    //               deposit.date.year == today.year &&
+    //               deposit.date.month == today.month &&
+    //               deposit.date.day == today.day)
+    //           .map((e) => e.asset!.name)
+    //           .toList();
+    //       result = result
+    //           .where((card) => filtredDeposits.contains(card.assetName))
+    //           .toList();
+    //       break;
+    //     case PeriodFilterEnum.monthly:
+    //       List<String> filtredDeposits = deposits
+    //           .where((deposit) =>
+    //               deposit.date.year == today.year &&
+    //               deposit.date.month == today.month)
+    //           .map((e) => e.asset!.name)
+    //           .toList();
+    //       result = result
+    //           .where((card) => filtredDeposits.contains(card.assetName))
+    //           .toList();
+    //       break;
+    //     case PeriodFilterEnum.yearly:
+    //       List<String> filtredDeposits = deposits
+    //           .where((deposit) => deposit.date.year == today.year)
+    //           .map((e) => e.asset!.name)
+    //           .toList();
+    //       result = result
+    //           .where((card) => filtredDeposits.contains(card.assetName))
+    //           .toList();
+    //       break;
+    //     default:
+    //   }
+    // }
 
     return result;
   }
 
   String getMidprice(Asset asset, bool mask) {
-    final filtredDeposits =
-        deposits.where((deposit) => deposit.asset?.name == asset.name).toList();
+    final filtredDeposits = deposits
+        .where((deposit) =>
+            deposit.asset?.name == asset.name &&
+            deposit.operation == Operation.buy)
+        .toList();
     var totalCoust = 0.0;
     var totalQuantity = 0.0;
     var midprice = 0.0;
@@ -405,7 +470,9 @@ class _MidPricePage extends State<MidPricePage> {
     midprice = totalCoust / totalQuantity;
     var res = '';
     if (mask) {
-      res = !midprice.isNaN ? 'R\$ ${midprice.toStringAsFixed(2)}' : ' - ';
+      res = !midprice.isNaN
+          ? '${context.loc.currency} ${midprice.toStringAsFixed(2)}'
+          : ' - ';
     } else {
       res = !midprice.isNaN ? midprice.toStringAsFixed(2) : '0';
     }

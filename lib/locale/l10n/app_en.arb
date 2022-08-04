@@ -1,0 +1,209 @@
+{
+    "helloWorld": "Hello World",
+    "confirmation": "Confirmation",
+    "notNow": "Not now",
+    "deleteTicker": "Delete asset",
+    "realyDeleteFile": "Do you really want to delete the asset {ticker}",
+    "@realyDeleteFile": {
+        "placeholders": {
+            "ticker": {
+                "type": "String",
+                "example": "ITSA4"
+            }
+        }
+    },
+    "warning": "Warning",
+    "deleteAnyway": "Delete anyway",
+    "foreignKeyViolationOnDeleteTicker": "You have contributions registered for the asset {ticker}. Deleting this asset will erase all contributions.",
+    "@foreignKeyViolationOnDeleteTicker": {
+        "placeholders": {
+            "ticker": {
+                "type": "String",
+                "example": "ITSA4"
+            }
+        }
+    },
+    "add": "Add",
+    "emptyWalletAlert": "Your wallet is empty. Add your first asset!",
+    "assetQuantityLimitRegister":"You can register up to {assetQuantityLimit} assets",
+    "@assetQuantityLimitRegister": {
+        "placeholders": {
+            "assetQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "playAddTip": "Watching ads will increase your wallet size!",
+    "playAdd": "Play add",
+    "currency": "$",
+    "snackDeleteMessage": "The asset {ticker} was deleted from your wallet",
+    "@snackDeleteMessage": {
+        "placeholders": {
+            "ticker": {
+                "type": "String",
+                "example": "ITSA4"
+            }
+        }
+    },
+    "newDeposit": "New deposit",
+    "fullWallet": "Your wallet is full!",
+    "limitAddAsset": "You have reached your limit of {assetQuantityLimit} assets registered. Watch an ad to free up more {assetLimitStep} spaces in the wallet.",
+    "@limitAddAsset": {
+        "placeholders": {
+            "assetQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            },
+            "assetLimitStep":  {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "deleteDeposit": "Delete deposit",
+    "realyDeleteDeposit": "Do you really want to delete this deposit?",
+    "buy": "Buy",
+    "firstDeposit": "First deposit",
+    "emptyDeposit": "No contributions founded. Make your first deposit!",
+    "playAddDepositTip": "Watching ads will allow you to make even more contributions!",
+    "depositQuantityLimitRegister": "You can make up to {depositQuantityLimit} contributions",
+    "@depositQuantityLimitRegister": {
+            "placeholders": {
+                "depositQuantityLimit": {
+                    "type": "int",
+                    "example": "2"
+                }
+            }
+        },
+        "increaseDepositLimit": "Your contribution limit has increased to {depositQuantityLimit}!",
+        "@increaseDepositLimit": {
+            "placeholders": {
+                "depositQuantityLimit": {
+                    "type": "int",
+                    "example": "2"
+                }
+            }
+        },
+    "addFailedError": "Your limit did not increase because the ad failed",
+    "addSkipedError": "Your limit did not increase because the ad was skipped",
+    "emptyShortWalletAlert": "Your wallet is empty.",
+    "emptyShortWalletAlertComplement": "Add your first asset in \"WALLET\" tab.",
+    "wallet": "Wallet",
+    "midPrice": "Midprice",
+    "contribution": "Contribution",
+    "currentAssetPrice": "Current price $ {assetPrice}",
+    "@currentAssetPrice": {
+        "placeholders": {
+            "assetPrice": {
+                "type": "String",
+                "example": "2"
+            }
+        }
+    },
+    "pm": "MP",
+    "total": "Total",
+    "units": "units to",
+    "deletedAssetFromWallet": "Contribution excluded from your portfolio",
+    "increaseDepositLimit": "Your contribution limit has increased to {depositQuantityLimit}! Now you can make more contributions",
+    "@increaseDepositLimit": {
+        "placeholders": {
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "soManyContribution": "Many contributions!",
+     "limitAddContribution": "You have reached your limit of {depositQuantityLimit} contributions registered. Watch an ad to free up more {depositLimitStep} spaces in the wallet.",
+    "@limitAddContribution": {
+        "placeholders": {
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            },
+            "depositLimitStep":  {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "playAddTipGeneral": "Watching ads will increase your contribution limits and amount of assets limit in your wallet",
+    "detail": "Detail",
+    "totalInvested": "Total invested $ {totalAported}",
+    "@totalInvested": {
+        "placeholders": {
+            "totalAported": {
+                "type": "String",
+                "example": "2.0"
+            }
+        }
+    },
+    "close": "Close",
+    "walletDetailMessage": "{deposits} contributions made and {wallet} assets registered.",
+    "@walletDetailMessage": {
+        "placeholders": {
+            "deposits": {
+                "type": "int",
+                "example": "2"
+            },
+            "wallet": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "walletDetailFirstComplementMessage": "Your asset limit is {assetQuantityLimit} and you can make up to {depositQuantityLimit} contributions",
+    "@walletDetailFirstComplementMessage": {
+        "placeholders": {
+            "assetQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            },
+            "depositQuantityLimit": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "walletDetailSecondComplementMessage": "Have you already performed {totalBuyed} buy operation(s) and {totalSelled} sell operation(s)",
+    "@walletDetailSecondComplementMessage": {
+        "placeholders": {
+            "totalBuyed": {
+                "type": "int",
+                "example": "2"
+            },
+            "totalSelled": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "attTicker": "Asset update",
+    "addTicker": "New asset",
+    "attContribution": "Contribution update",
+    "addContribution": "New contribution",
+    "requiredField": "Required field",
+    "price": "Price",
+    "save": "Save",
+    "updatedTicker": "Updated asset",
+    "addedTickerToWallet": "Asset added to wallet",
+    "updatedContribution": "Updated contribution",
+    "addedContributionToWallet": "Contribution added to wallet",
+    "selectOneOperation": "Select a operation",
+    "selectOneTicker": "Select an asset",
+    "quantity": "Quantity",
+    "contributionQuantity": "Contribution quantity",
+    "fees": "Fees",
+    "feeDescription": "Fees from your brokerage note",
+    "totalCostToContribution": "Total cost to contribution",
+    "tickerValue": "Ticker value $ {value}",
+    "@tickerValue": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "2"
+            }
+        }
+    }
+}

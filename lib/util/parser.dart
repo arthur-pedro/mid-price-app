@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:midprice/models/deposit/enum_operation.dart';
 
 abstract class Parser {
   static String doubleToString(double value) {
@@ -36,5 +37,16 @@ abstract class Parser {
 
   static int boolToInt(bool value) {
     return value ? 1 : 0;
+  }
+
+  static Operation stringToOperation(String operation) {
+    switch (operation) {
+      case 'buy':
+        return Operation.buy;
+      case 'sell':
+        return Operation.sell;
+      default:
+        throw Exception('Operaçao não identificada $operation');
+    }
   }
 }

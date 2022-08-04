@@ -9,10 +9,12 @@ import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/config/config.dart';
 import 'package:midprice/models/deposit/deposit.dart';
 import 'package:midprice/components/dialog.dart';
+import 'package:midprice/models/deposit/enum_operation.dart';
 import 'package:midprice/pages/form/deposit_form_page.dart';
 import 'package:midprice/pages/form/wallet_form_page.dart';
 import 'package:midprice/util/timeago_custom_message.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:midprice/locale/app_localizations_context.dart';
 
 class DepositPage extends StatefulWidget {
   const DepositPage({Key? key}) : super(key: key);
@@ -118,8 +120,12 @@ class _DepositPage extends State<DepositPage> {
   }
 
   Future<ViewDialogsAction> openConfirmationDeleteDialog() async {
-    return await ViewDialogs.yesOrNoDialog(context, 'Confirmação',
-        'Deseja realmente excluir este aporte', 'Agora não', 'Apagar aporte');
+    return await ViewDialogs.yesOrNoDialog(
+        context,
+        context.loc.confirmation,
+        context.loc.realyDeleteDeposit,
+        context.loc.notNow,
+        context.loc.deleteDeposit);
   }
 
   void _navigateToForm(Deposit? depositToCreateOrEdit) {
@@ -130,7 +136,7 @@ class _DepositPage extends State<DepositPage> {
                     date: DateTime.now(),
                     quantity: 0.0,
                     payedValue: 0.0,
-                    operation: 'Compra',
+                    operation: Operation.buy,
                     fee: 0.0))))
         .then((asset) => {
               if (asset != null)
@@ -167,12 +173,12 @@ class _DepositPage extends State<DepositPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            const Text('Nenhum aporte encontrado. Faça seu primeiro aporte!'),
+            Text(context.loc.emptyDeposit),
             ElevatedButton(
               onPressed: () {
                 _navigateToForm(null);
               },
-              child: const Text('Primeiro aporte'),
+              child: Text(context.loc.firstDeposit),
             ),
           ],
         ),
@@ -198,16 +204,15 @@ class _DepositPage extends State<DepositPage> {
                             Icons.tips_and_updates_outlined,
                             color: Colors.amber,
                           ),
-                          title: Text(
-                              'Você pode fazer até ${config.depositQuantityLimit} aportes'),
-                          subtitle: const Text(
-                              'Assistir anúncios permitirá você realizar ainda mais aportes!'),
+                          title: Text(context.loc.depositQuantityLimitRegister(
+                              config.depositQuantityLimit)),
+                          subtitle: Text(context.loc.playAddDepositTip),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             TextButton(
-                              child: const Text('AGORA NÃO'),
+                              child: Text(context.loc.notNow.toUpperCase()),
                               onPressed: () {
                                 setState(() {
                                   showTips = false;
@@ -216,26 +221,27 @@ class _DepositPage extends State<DepositPage> {
                             ),
                             const SizedBox(width: 8),
                             TextButton(
-                              child: const Text('ASSITIR ANÚNCIO'),
+                              child: Text(context.loc.playAdd.toUpperCase()),
                               onPressed: () {
                                 UnityAdsHandler.showVideoAd(
                                     () => {
                                           increaseDepositQuantityLimit(),
                                           ViewSnackbar.show(
                                               context,
-                                              'Seu limite de aportes aumentou para ${config.depositQuantityLimit}!',
+                                              context.loc.increaseDepositLimit(
+                                                  config.depositQuantityLimit),
                                               ViewSnackbarStatus.success)
                                         },
                                     () => {
                                           ViewSnackbar.show(
                                               context,
-                                              'Seu limite não aumentou porque o anúncio falhou',
+                                              context.loc.addFailedError,
                                               ViewSnackbarStatus.error)
                                         },
                                     () => {
                                           ViewSnackbar.show(
                                               context,
-                                              'Seu limite não aumentou porque o anúncio foi pulado',
+                                              context.loc.addSkipedError,
                                               ViewSnackbarStatus.warning)
                                         });
                               },
@@ -259,13 +265,14 @@ class _DepositPage extends State<DepositPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               Icon(
-                                deposits[index].operation == 'Compra'
+                                deposits[index].operation == Operation.buy
                                     ? Icons.add_box
                                     : Icons.indeterminate_check_box,
                                 size: 16,
-                                color: deposits[index].operation == 'Compra'
-                                    ? Colors.teal
-                                    : Colors.deepOrange,
+                                color:
+                                    deposits[index].operation == Operation.buy
+                                        ? Colors.teal
+                                        : Colors.deepOrange,
                               ),
                               Text(DateFormat('d/MMM', "pt_BR")
                                   .format(deposits[index].date)),
@@ -275,21 +282,21 @@ class _DepositPage extends State<DepositPage> {
                       ),
                       title: Text(deposits[index].asset!.name),
                       subtitle: Text(
-                          '${deposits[index].quantity} unidades a R\$ ${deposits[index].payedValue}'),
+                          '${deposits[index].quantity} ${context.loc.units} ${context.loc.currency} ${deposits[index].payedValue}'),
                       trailing: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            const Text('Total'),
+                            Text(context.loc.total),
                             Text(
-                                'R\$ ${((deposits[index].quantity * deposits[index].payedValue) + deposits[index].fee).toStringAsFixed(2)}'),
+                                '${context.loc.currency} ${((deposits[index].quantity * deposits[index].payedValue) + deposits[index].fee).toStringAsFixed(2)}'),
                           ]),
                       onTap: () => {_navigateToForm(deposits[index])},
                       onLongPress: (() async {
                         var action = await openConfirmationDeleteDialog();
                         if (action == ViewDialogsAction.yes) {
                           delete(deposits[index]);
-                          showSnackBar('Aporte excluído da sua carteira',
+                          showSnackBar(context.loc.deletedAssetFromWallet,
                               ViewSnackbarStatus.success);
                         }
                       }),
@@ -308,31 +315,27 @@ class _DepositPage extends State<DepositPage> {
                 deposits.length >= config.depositQuantityLimit) {
               final action = await ViewDialogs.yesOrNoDialog(
                   context,
-                  'Muitos aportes!',
-                  'Você atingiu seu limite de ${config.depositQuantityLimit} '
-                      'aportes cadastrados. Assista um ancúncio para '
-                      'liberar mais ${config.assetLimitStep} espaços na carteira.',
-                  'Agora não',
-                  'Assistir anúncio');
+                  context.loc.soManyContribution,
+                  context.loc.limitAddContribution(
+                      config.depositQuantityLimit, config.depositLimitStep),
+                  context.loc.notNow,
+                  context.loc.playAdd);
               if (action == ViewDialogsAction.yes) {
                 UnityAdsHandler.showVideoAd(
                     () => {
                           increaseDepositQuantityLimit(),
                           ViewSnackbar.show(
                               context,
-                              'Seu limite de aportes aumentou para ${config.depositQuantityLimit}! Agora você pode realizar mais aportes',
+                              context.loc.increaseDepositLimit(
+                                  config.depositQuantityLimit),
                               ViewSnackbarStatus.success)
                         },
                     () => {
-                          ViewSnackbar.show(
-                              context,
-                              'Seu limite não aumentou porque o anúncio falhou',
+                          ViewSnackbar.show(context, context.loc.addFailedError,
                               ViewSnackbarStatus.error)
                         },
                     () => {
-                          ViewSnackbar.show(
-                              context,
-                              'Seu limite não aumentou porque o anúncio foi pulado',
+                          ViewSnackbar.show(context, context.loc.addSkipedError,
                               ViewSnackbarStatus.warning)
                         });
               }
@@ -340,7 +343,7 @@ class _DepositPage extends State<DepositPage> {
               _navigateToForm(null);
             }
           },
-          tooltip: 'Novo Investimento',
+          tooltip: context.loc.newDeposit,
           child: const Icon(Icons.add),
         ));
   }
@@ -350,10 +353,10 @@ class _DepositPage extends State<DepositPage> {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            Text('Sua carteira esta vazia.'),
-            Text('Adicione seu primeiro ativo na aba "CARTEIRA"!'),
+          children: [
+            const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
+            Text(context.loc.emptyShortWalletAlert),
+            Text(context.loc.emptyShortWalletAlertComplement),
           ],
         ),
       ),

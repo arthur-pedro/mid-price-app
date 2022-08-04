@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:midprice/components/snackbar.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
+import 'package:midprice/locale/locale_static_message.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/deposit/deposit.dart';
+import 'package:midprice/locale/app_localizations_context.dart';
+import 'package:midprice/models/deposit/enum_operation.dart';
 
 // ignore: must_be_immutable
 class DepositForm extends StatefulWidget {
@@ -12,7 +15,7 @@ class DepositForm extends StatefulWidget {
       payedValue: 0,
       quantity: 0,
       fee: 0.0,
-      operation: 'Compra');
+      operation: Operation.buy);
   DepositForm({Key? key, required this.deposit}) : super(key: key);
 
   static const routeName = '/deposit/form';
@@ -22,17 +25,16 @@ class DepositForm extends StatefulWidget {
 }
 
 class _DepositForm extends State<DepositForm> {
-  String title = 'Novo Aporte';
+  String title = '';
   bool isLoading = false;
 
-  List<String> operations = ['Compra', 'Venda'];
+  List<Operation> operations = [Operation.buy, Operation.sell];
 
   final _formKey = GlobalKey<FormState>();
 
   List<Asset> wallet = [];
 
   bool hasDropdownAssetError = false;
-  bool hasDropdownOperationError = false;
 
   @override
   void initState() {
@@ -63,29 +65,19 @@ class _DepositForm extends State<DepositForm> {
     return !hasDropdownAssetError;
   }
 
-  bool validateDropboxOperation() {
-    if (widget.deposit.operation.isNotEmpty) {
-      setState(() {
-        hasDropdownOperationError = false;
-      });
-    } else {
-      setState(() {
-        hasDropdownOperationError = true;
-      });
-    }
-    return !hasDropdownOperationError;
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isUpdate = false;
     if (widget.deposit.id != null) {
       isUpdate = true;
-      title = 'Atualização de aporte';
+      title = context.loc.attContribution;
+    } else {
+      title = context.loc.addContribution;
     }
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(title),
       ),
       body: SingleChildScrollView(
@@ -98,38 +90,32 @@ class _DepositForm extends State<DepositForm> {
                 children: [
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                    child: DropdownButton<String>(
+                    child: DropdownButtonFormField<Operation>(
                       value: widget.deposit.operation,
                       selectedItemBuilder: (BuildContext context) {
-                        return operations.map<Widget>((String item) {
-                          return Text(item);
+                        return operations.map<Widget>((Operation item) {
+                          return Text(LocaleStaticMessage.translate(
+                              context.loc.localeName, item.name));
                         }).toList();
                       },
                       isExpanded: true,
-                      underline: Container(
-                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 3),
-                        height: 1,
-                        color: hasDropdownOperationError
-                            ? const Color.fromARGB(255, 217, 49, 37)
-                            : Colors.blueGrey,
-                      ),
-                      hint: const Text('Selecione uma operação'),
-                      onChanged: (String? newValue) {
+                      hint: Text(context.loc.selectOneOperation),
+                      onChanged: (Operation? newValue) {
                         setState(() {
                           widget.deposit.operation = newValue!;
-                          validateDropboxOperation();
                         });
                       },
                       items: operations
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
+                          .map<DropdownMenuItem<Operation>>((Operation value) {
+                        return DropdownMenuItem<Operation>(
                           value: value,
-                          child: Text(value),
+                          child: Text(LocaleStaticMessage.translate(
+                              context.loc.localeName, value.name)),
                         );
                       }).toList(),
                     ),
                   ),
-                  DropdownButton<Asset>(
+                  DropdownButtonFormField<Asset>(
                     value: widget.deposit.asset,
                     selectedItemBuilder: (BuildContext context) {
                       return wallet.map<Widget>((Asset item) {
@@ -137,14 +123,7 @@ class _DepositForm extends State<DepositForm> {
                       }).toList();
                     },
                     isExpanded: true,
-                    underline: Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 3),
-                      height: 1,
-                      color: hasDropdownAssetError
-                          ? const Color.fromARGB(255, 217, 49, 37)
-                          : Colors.blueGrey,
-                    ),
-                    hint: const Text('Selecione um ativo'),
+                    hint: Text(context.loc.selectOneTicker),
                     onChanged: (Asset? newValue) {
                       setState(() {
                         widget.deposit.payedValue = newValue!.price;
@@ -159,12 +138,6 @@ class _DepositForm extends State<DepositForm> {
                       );
                     }).toList(),
                   ),
-                  hasDropdownAssetError
-                      ? const Text('Campo obrigatório',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 217, 49, 37),
-                              fontSize: 12))
-                      : const SizedBox.shrink(),
                   TextFormField(
                     initialValue: widget.deposit.quantity.toString(),
                     keyboardType:
@@ -178,15 +151,15 @@ class _DepositForm extends State<DepositForm> {
                         ),
                       ),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Quantidade',
-                      hintText: 'Quantidade do aporte',
+                    decoration: InputDecoration(
+                      labelText: context.loc.quantity,
+                      hintText: context.loc.contributionQuantity,
                     ),
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
                           double.parse(value) < 0) {
-                        return 'Campo obrigatório';
+                        return context.loc.requiredField;
                       }
                       return null;
                     },
@@ -215,15 +188,15 @@ class _DepositForm extends State<DepositForm> {
                         ),
                       ),
                     ],
-                    decoration: const InputDecoration(
-                        labelText: 'Taxas',
-                        hintText: 'Emolumentos, Corretagem, etc...',
-                        prefix: Text('R\$ ')),
+                    decoration: InputDecoration(
+                        labelText: context.loc.fees,
+                        hintText: context.loc.feeDescription,
+                        prefix: Text('${context.loc.currency} ')),
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
                           double.parse(value) < 0) {
-                        return 'Campo obrigatório';
+                        return context.loc.requiredField;
                       }
                       return null;
                     },
@@ -240,12 +213,14 @@ class _DepositForm extends State<DepositForm> {
                   ),
                   Container(
                       padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                      child: Text(
-                          'Valor do ativo  R\$ ${(widget.deposit.asset?.price ?? '0.00')}')),
-                  SizedBox(child: Text('Taxas  R\$ ${(widget.deposit.fee)}')),
+                      child: Text(context.loc.tickerValue(
+                          (widget.deposit.asset?.price.toString() ?? '0.00')))),
                   SizedBox(
                       child: Text(
-                          'Custo total to aporte  R\$ ${(widget.deposit.fee + (widget.deposit.payedValue * widget.deposit.quantity)).toStringAsFixed(2)}')),
+                          '${context.loc.fees} ${context.loc.currency} ${(widget.deposit.fee)}')),
+                  SizedBox(
+                      child: Text(
+                          '${context.loc.totalCostToContribution} ${context.loc.currency} ${(widget.deposit.fee + (widget.deposit.payedValue * widget.deposit.quantity)).toStringAsFixed(2)}')),
                   Container(
                     alignment: Alignment.center,
                     child: Padding(
@@ -253,22 +228,21 @@ class _DepositForm extends State<DepositForm> {
                       child: ElevatedButton(
                         onPressed: () {
                           final form = _formKey.currentState;
-                          if (form!.validate() &&
-                              validateDropboxAsset() &&
-                              validateDropboxOperation()) {
+                          if (form!.validate() && validateDropboxAsset()) {
                             form.save();
                             String msg = '';
                             if (isUpdate) {
-                              msg = 'Aporte atualizado.';
+                              msg = context.loc.updatedContribution;
                             } else {
-                              msg = 'Aporte adicionado à carteira.';
+                              msg = context.loc.addedContributionToWallet;
                             }
                             Navigator.pop(context, widget.deposit);
                             ViewSnackbar.show(
                                 context, msg, ViewSnackbarStatus.success);
                           }
                         },
-                        child: Text(isUpdate ? 'Salvar' : 'Adicionar'),
+                        child:
+                            Text(isUpdate ? context.loc.save : context.loc.add),
                       ),
                     ),
                   )

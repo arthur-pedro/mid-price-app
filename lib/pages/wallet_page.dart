@@ -6,17 +6,17 @@ import 'package:midprice/components/snackbar.dart';
 import 'package:midprice/database/asset/asset_repository.dart';
 import 'package:midprice/database/config/config_repository.dart';
 import 'package:midprice/database/deposit/deposit_repository.dart';
+import 'package:midprice/locale/locale_static_message.dart';
 import 'package:midprice/models/asset/asset.dart';
 import 'package:midprice/models/category/asset_brl_stock_category.dart';
 import 'package:midprice/models/config/config.dart';
-import 'package:midprice/models/deposit/deposit.dart';
 import 'package:midprice/components/dialog.dart';
 import 'package:midprice/pages/form/wallet_form_page.dart';
 
+import 'package:midprice/locale/app_localizations_context.dart';
+
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
-
-  static const routeName = '/wallet';
 
   @override
   State<WalletPage> createState() => _WalletPage();
@@ -90,20 +90,20 @@ class _WalletPage extends State<WalletPage> {
   Future<ViewDialogsAction> openConfirmationDeleteDialog(Asset asset) async {
     return await ViewDialogs.yesOrNoDialog(
         context,
-        'Confirmação',
-        'Deseja realmente excluir o ativo ${asset.name}',
-        'Agora não',
-        'Apagar ativo');
+        context.loc.confirmation,
+        context.loc.realyDeleteFile(asset.name),
+        context.loc.notNow,
+        context.loc.deleteTicker);
   }
 
   Future<ViewDialogsAction> openConfirmationDeleteDialogAlreadyExist(
       Asset asset) async {
     return await ViewDialogs.yesOrNoDialog(
         context,
-        'Cuidado',
-        'Você tem aportes cadastrados para o ativo ${asset.name}. Excluir este ativo apagará todos os aportes',
-        'Agora não',
-        'Apagar mesmo assim');
+        context.loc.warning,
+        context.loc.foreignKeyViolationOnDeleteTicker(asset.name),
+        context.loc.notNow,
+        context.loc.deleteAnyway);
   }
 
   Future<bool> hasDepositByAssetId(String assetName) async {
@@ -167,12 +167,12 @@ class _WalletPage extends State<WalletPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.search_off_outlined, color: Colors.blueGrey),
-            const Text('Sua carteira está vazia. Adicione seu primeiro ativo!'),
+            Text(context.loc.emptyWalletAlert),
             ElevatedButton(
               onPressed: () {
                 _navigateToForm(null);
               },
-              child: const Text('Adicionar'),
+              child: Text(context.loc.add),
             ),
           ],
         ),
@@ -196,16 +196,15 @@ class _WalletPage extends State<WalletPage> {
                         ListTile(
                           leading: const Icon(Icons.tips_and_updates_outlined,
                               color: Colors.amber),
-                          title: Text(
-                              'Você pode cadastrar até ${config.assetQuantityLimit} ativos'),
-                          subtitle: const Text(
-                              'Assistir anúncios irá aumentar o tamanho da sua carteira!'),
+                          title: Text(context.loc.assetQuantityLimitRegister(
+                              config.assetQuantityLimit)),
+                          subtitle: Text(context.loc.playAddTip),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             TextButton(
-                              child: const Text('AGORA NÃO'),
+                              child: Text(context.loc.notNow.toUpperCase()),
                               onPressed: () {
                                 setState(() {
                                   showTips = false;
@@ -214,12 +213,22 @@ class _WalletPage extends State<WalletPage> {
                             ),
                             const SizedBox(width: 8),
                             TextButton(
-                              child: const Text('ASSITIR ANÚNCIO'),
+                              child: Text(context.loc.playAdd.toUpperCase()),
                               onPressed: () {
                                 UnityAdsHandler.showVideoAd(
                                     () => {increaseAssetQuantityLimit()},
-                                    () => {},
-                                    () => {});
+                                    () => {
+                                          ViewSnackbar.show(
+                                              context,
+                                              context.loc.addFailedError,
+                                              ViewSnackbarStatus.error)
+                                        },
+                                    () => {
+                                          ViewSnackbar.show(
+                                              context,
+                                              context.loc.addSkipedError,
+                                              ViewSnackbarStatus.warning)
+                                        });
                               },
                             ),
                             const SizedBox(width: 8),
@@ -245,8 +254,11 @@ class _WalletPage extends State<WalletPage> {
                       title: Text(
                         assets[index].name,
                       ),
-                      subtitle: Text(assets[index].category.name),
-                      trailing: Text('R\$ ${assets[index].price.toString()}'),
+                      subtitle: Text(LocaleStaticMessage.translate(
+                          context.loc.localeName,
+                          assets[index].category.name.name)),
+                      trailing: Text(
+                          '${context.loc.currency} ${assets[index].price.toString()}'),
                       onTap: () => {_navigateToForm(assets[index])},
                       onLongPress: (() async {
                         var action =
@@ -261,13 +273,15 @@ class _WalletPage extends State<WalletPage> {
                             if (action == ViewDialogsAction.yes) {
                               delete(assets[index]);
                               showSnackBar(
-                                  'O ativo ${assets[index].name} foi excluído da sua carteira',
+                                  context.loc
+                                      .snackDeleteMessage(assets[index].name),
                                   ViewSnackbarStatus.success);
                             }
                           } else {
                             delete(assets[index]);
                             showSnackBar(
-                                'O ativo ${assets[index].name} foi excluído da sua carteira',
+                                context.loc
+                                    .snackDeleteMessage(assets[index].name),
                                 ViewSnackbarStatus.success);
                           }
                         }
@@ -287,12 +301,11 @@ class _WalletPage extends State<WalletPage> {
                 wallet.length >= config.assetQuantityLimit) {
               final action = await ViewDialogs.yesOrNoDialog(
                   context,
-                  'Sua carteira está cheia!',
-                  'Você atingiu seu limite de ${config.assetQuantityLimit} '
-                      'ativos cadastrados. Assista um ancúncio para '
-                      'liberar mais ${config.assetLimitStep} espaços na carteira.',
-                  'Agora não',
-                  'Assistir anúncio');
+                  context.loc.fullWallet,
+                  context.loc.limitAddAsset(
+                      config.assetQuantityLimit, config.assetLimitStep),
+                  context.loc.notNow,
+                  context.loc.playAdd);
               if (action == ViewDialogsAction.yes) {
                 UnityAdsHandler.showVideoAd(
                     () => {increaseAssetQuantityLimit(), _navigateToForm(null)},
@@ -303,7 +316,7 @@ class _WalletPage extends State<WalletPage> {
               _navigateToForm(null);
             }
           },
-          tooltip: 'Novo Investimento',
+          tooltip: context.loc.newDeposit,
           child: const Icon(Icons.add),
           // child: const Icon(Icons.add),
         ));

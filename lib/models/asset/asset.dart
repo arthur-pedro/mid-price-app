@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:midprice/database/asset/asset_bo.dart';
 import 'package:midprice/models/category/asset_brl_etf_category.dart';
 import 'package:midprice/models/category/asset_brl_fii_category.dart';
 import 'package:midprice/models/category/asset_brl_stock_category.dart';
 import 'package:midprice/models/category/asset_category.dart';
+import 'package:midprice/models/category/asset_category_id.dart';
+import 'package:midprice/models/category/asset_category_list.dart';
 import 'package:midprice/models/category/asset_cdb_category.dart';
 import 'package:midprice/models/category/asset_others_category.dart';
-import 'package:midprice/models/category/asset_treasure_category%20copy.dart';
+import 'package:midprice/models/category/asset_treasure_category.dart';
 import 'package:midprice/util/parser.dart';
 
 class Asset {
@@ -37,33 +41,14 @@ class Asset {
 
   static Map<String, Object?> toJson(Asset asset) => {
         AssetBO.id: asset.id,
-        AssetBO.name: asset.name,
-        AssetBO.price: Parser.doubleToString(asset.price),
-        AssetBO.category: asset.category.id
+        AssetBO.name: asset.name.trim(),
+        AssetBO.price: Parser.doubleToString(asset.price).trim(),
+        AssetBO.category: asset.category.id.name
       };
 
   static AssetCategory getCategory(String category) {
-    AssetCategory res;
-    switch (category) {
-      case 'ACAO':
-        res = AssetBrlStockCategory();
-        break;
-      case 'FUNDO_INVESTIMENTO_IMOBILIARIO':
-        res = AssetBrlFiiCategory();
-        break;
-      case 'CDB':
-        res = AssetCdbCategory();
-        break;
-      case 'TESOURO_DIRETO':
-        res = AssetTreasureCategory();
-        break;
-      case 'BRL_ETF':
-        res = AssetBrlEtfCategory();
-        break;
-      default:
-        res = AssetOtherCategory();
-        break;
-    }
-    return res;
+    return AssetCategoryList.all()
+        .firstWhere((element) => element.id.name == category);
+    ;
   }
 }

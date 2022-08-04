@@ -11,6 +11,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:midprice/theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:midprice/locale/app_localizations_context.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -34,12 +37,8 @@ class MyApp extends StatelessWidget {
           textTheme: customTheme.textTheme(),
           tabBarTheme: customTheme.tabBarTheme()),
       home: const TabPage(),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('pt', 'BR')],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
     );
   }
@@ -106,12 +105,12 @@ class _TabPagePageState extends State<TabPage> {
                 ),
               ),
             ],
-            bottom: const TabBar(
+            bottom: TabBar(
               indicatorWeight: 3,
               tabs: [
-                Tab(text: 'PREÇO MÉDIO'),
-                Tab(text: 'APORTES'),
-                Tab(text: 'CARTEIRA'),
+                Tab(text: context.loc.midPrice.toUpperCase()),
+                Tab(text: context.loc.contribution.toUpperCase()),
+                Tab(text: context.loc.wallet.toUpperCase()),
               ],
             ),
           ),

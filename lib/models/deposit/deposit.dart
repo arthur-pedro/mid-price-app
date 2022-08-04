@@ -1,5 +1,6 @@
 import 'package:midprice/database/deposit/deposit_bo.dart';
 import 'package:midprice/models/asset/asset.dart';
+import 'package:midprice/models/deposit/enum_operation.dart';
 import 'package:midprice/util/parser.dart';
 
 class Deposit {
@@ -13,7 +14,7 @@ class Deposit {
 
   double payedValue;
 
-  String operation;
+  Operation operation;
 
   double fee;
 
@@ -39,16 +40,16 @@ class Deposit {
           category: Asset.getCategory(
               json[DepositBO.aliasPkAssetCategory] as String)),
       payedValue: Parser.stringToDouble(json[DepositBO.payedValue] as String),
-      operation: json[DepositBO.operation] as String,
+      operation: Parser.stringToOperation(json[DepositBO.operation] as String),
       fee: Parser.stringToDouble(json[DepositBO.fee] as String));
 
   static Map<String, Object?> toJson(Deposit entity) => {
         DepositBO.id: entity.id,
         DepositBO.date: Parser.dateToMilliseconds(entity.date),
-        DepositBO.quantity: Parser.doubleToString(entity.quantity),
+        DepositBO.quantity: Parser.doubleToString(entity.quantity).trim(),
         DepositBO.asset: entity.asset!.name,
-        DepositBO.payedValue: Parser.doubleToString(entity.payedValue),
-        DepositBO.operation: entity.operation,
-        DepositBO.fee: Parser.doubleToString(entity.fee),
+        DepositBO.payedValue: Parser.doubleToString(entity.payedValue).trim(),
+        DepositBO.operation: entity.operation.name,
+        DepositBO.fee: Parser.doubleToString(entity.fee).trim(),
       };
 }
