@@ -22,23 +22,35 @@ class UnityAdsHandler {
 
   static void showVideoAd(
       Function onComplete, Function onFailed, Function onSkipped) {
-    UnityAds.showVideoAd(
+    UnityAds.load(
       placementId: 'Rewarded_Android',
-      onClick: (placementId) {
-        log('Clicou UnityAds!');
-      },
       onComplete: (placementId) {
-        log('Completou UnityAds!');
-        onComplete();
+        UnityAds.showVideoAd(
+          placementId: placementId,
+          onClick: (placementId) {
+            log('Clicou UnityAds!');
+          },
+          onComplete: (placementId) {
+            onComplete();
+            log('Completou UnityAds!');
+          },
+          onFailed: (placementId, error, errorMessage) {
+            log('Falhou UnityAds!');
+            log(errorMessage);
+            onFailed();
+          },
+          onSkipped: (placementId) {
+            log('Pulou UnityAds!');
+            onSkipped();
+          },
+          onStart: (placementId) {
+            log('Comecou UnityAds!');
+          },
+        );
       },
       onFailed: (placementId, error, errorMessage) {
-        log('Falhou UnityAds!');
-      },
-      onSkipped: (placementId) {
-        log('Pulou UnityAds!');
-      },
-      onStart: (placementId) {
-        log('Comecou UnityAds!');
+        log(errorMessage);
+        onFailed();
       },
     );
   }

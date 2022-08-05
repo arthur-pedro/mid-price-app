@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:midprice/ads/unity_ads_handler.dart';
 import 'package:midprice/components/dialog.dart';
+import 'package:midprice/components/snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:midprice/locale/app_localizations_context.dart';
 
@@ -26,7 +27,15 @@ class _AboutPage extends State<AboutPage> {
         context.loc.yesNiceAds);
     if (action == ViewDialogsAction.yes) {
       UnityAdsHandler.showVideoAd(
-          () => {openThanksDialog()}, () => {}, () => {});
+          () => {openThanksDialog()},
+          () => {
+                ViewSnackbar.show(context, context.loc.addFailedError,
+                    ViewSnackbarStatus.error)
+              },
+          () => {
+                ViewSnackbar.show(context, context.loc.addSkipedError,
+                    ViewSnackbarStatus.warning)
+              });
     }
   }
 
@@ -49,7 +58,19 @@ class _AboutPage extends State<AboutPage> {
               ElevatedButton(
                   onPressed: () {
                     UnityAdsHandler.showVideoAd(
-                        () => {openThanksDialog()}, () => {}, () => {});
+                        () => {openThanksDialog()},
+                        () => {
+                              ViewSnackbar.show(
+                                  context,
+                                  context.loc.addFailedError,
+                                  ViewSnackbarStatus.error)
+                            },
+                        () => {
+                              ViewSnackbar.show(
+                                  context,
+                                  context.loc.addSkipedError,
+                                  ViewSnackbarStatus.warning)
+                            });
                   },
                   child: Text(context.loc.playAddSmile)),
               const Padding(padding: EdgeInsets.fromLTRB(0, 50, 0, 0)),

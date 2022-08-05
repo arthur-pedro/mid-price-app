@@ -309,8 +309,14 @@ class _WalletPage extends State<WalletPage> {
               if (action == ViewDialogsAction.yes) {
                 UnityAdsHandler.showVideoAd(
                     () => {increaseAssetQuantityLimit(), _navigateToForm(null)},
-                    () => {},
-                    () => {});
+                    () => {
+                          ViewSnackbar.show(context, context.loc.addFailedError,
+                              ViewSnackbarStatus.error)
+                        },
+                    () => {
+                          ViewSnackbar.show(context, context.loc.addSkipedError,
+                              ViewSnackbarStatus.warning)
+                        });
               }
             } else {
               _navigateToForm(null);
