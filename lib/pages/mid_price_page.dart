@@ -57,12 +57,11 @@ class _MidPricePage extends State<MidPricePage> {
   String totalAported = '0.0';
   int totalBuyed = 0;
   int totalSelled = 0;
-  String tip = LvlUtil.randomTip();
+  String tip = '';
   List<int> yearList = [];
   List<MidPriceCard> cards = [];
 
   List<CategoryFilter> categoryFilters = [];
-  // List<PeriodFilter> periodFilters = [];
 
   @override
   void initState() {
@@ -82,6 +81,8 @@ class _MidPricePage extends State<MidPricePage> {
     totalAported = getDetails();
 
     calculateLvl();
+
+    tip = LvlUtil.randomTip(context.loc.localeName);
 
     for (var index = 0; index < wallet.length; index++) {
       cards.add(MidPriceCard(

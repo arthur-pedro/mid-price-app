@@ -205,5 +205,16 @@
                 "example": "2"
             }
         }
-    }
+    },
+    "aboutRebalanceTitle": "Sobre o Rebalance",
+    "aboutRebalanceDesc": "'Rebalance - Calculadora de preço médio' é uma ferramenta oferecida pelo Rebalance, para auxiliar você a organizar seu portfólio. Neste app, é possivel cadastrar sua carteira e salvar seus aportes, obtendo o preço médio  de seus ativos.",
+    "aboutRebalanceDescComplement": "Ajudando assim, a ter um histório de seus investimentos, e apoiando e facilitando também na declaração de imposto de renda.",
+    "helpUsPlayAdd": "Ajude-nos a melhorar assistindo um anúncio.",
+    "playAddSmile": "Assistir anúncio :D",
+    "helpPlataformText": "Você está contribuindo para melhoria da platadorma. Obrigado pelo apoio! Deseja assistir outro anúncio?",
+    "yesNiceAds": "Sim! Anúncios são legais",
+    "meetRebalance": "Conheça nosso balanceador de carteira em rebalance.com.br",
+    "questionsAndSugestionContact": "Dúvidas e sugestões, entrar em contato pelo e-mail: admin@rebalance.com.br",
+    "appVersion": "Versão do aplicativo",
+    "copyright": "Todos os direitos reservados"
 }

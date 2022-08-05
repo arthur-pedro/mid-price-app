@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:midprice/ads/unity_ads_handler.dart';
 import 'package:midprice/components/dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:midprice/locale/app_localizations_context.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
@@ -11,8 +12,6 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPage extends State<AboutPage> {
-  String title = "Sobre o Rebalance";
-
   @override
   void initState() {
     super.initState();
@@ -22,9 +21,9 @@ class _AboutPage extends State<AboutPage> {
     final action = await ViewDialogs.yesOrNoDialog(
         context,
         'Aeew!!',
-        'Você está contribuindo para melhoria da platadorma. Obrigado pelo apoio! Deseja assistir outro anúncio?',
-        'Agora não',
-        'Sim! Anúncios são legais!');
+        context.loc.helpPlataformText,
+        context.loc.notNow,
+        context.loc.yesNiceAds);
     if (action == ViewDialogsAction.yes) {
       UnityAdsHandler.showVideoAd(
           () => {openThanksDialog()}, () => {}, () => {});
@@ -35,25 +34,24 @@ class _AboutPage extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          centerTitle: true,
+          title: Text(context.loc.aboutRebalanceTitle),
         ),
         body: Container(
             padding: const EdgeInsets.fromLTRB(25, 25, 25, 25),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text(
-                  'O Rebalance - Calculadora de preço médio é uma ferramenta oferecida pelo Rebalance, para auxiliar você a organizar seu portfólio. Neste app, é possivel cadastrar sua carteira e salvar seus aportes, obtendo o preço médio  de seus ativos.'),
+              Text(context.loc.aboutRebalanceDesc),
               const Padding(padding: EdgeInsets.fromLTRB(0, 25, 0, 0)),
-              const Text(
-                  'Ajudando assim, a ter um histório de seus investimentos, e apoiando e facilitando também na declaração de imposto de renda.'),
+              Text(context.loc.aboutRebalanceDescComplement),
               const Padding(padding: EdgeInsets.fromLTRB(0, 25, 0, 0)),
-              const Text('Ajude-nos a melhorar assistindo um anúncio.'),
+              Text(context.loc.helpUsPlayAdd),
               ElevatedButton(
                   onPressed: () {
                     UnityAdsHandler.showVideoAd(
                         () => {openThanksDialog()}, () => {}, () => {});
                   },
-                  child: const Text('Assistir anúncio :D')),
+                  child: Text(context.loc.playAddSmile)),
               const Padding(padding: EdgeInsets.fromLTRB(0, 50, 0, 0)),
               TextButton(
                 onPressed: () async {
@@ -65,14 +63,12 @@ class _AboutPage extends State<AboutPage> {
                     throw 'Could not launch $url';
                   }
                 },
-                child: const Text(
-                    'Conheça nosso balanceador de carteira em rebalance.com.br'),
+                child: Text(context.loc.meetRebalance),
               ),
               const Padding(padding: EdgeInsets.fromLTRB(0, 25, 0, 0)),
-              const Text(
-                  'Dúvidas e sugestões, entrar em contato pelo e-mail: admin@rebalance.com.br'),
+              Text(context.loc.questionsAndSugestionContact),
               const Padding(padding: EdgeInsets.fromLTRB(0, 25, 0, 0)),
-              const Text('Versão do aplicativo v1.0.0')
+              Text('${context.loc.appVersion} v2.0.0')
             ])),
         bottomNavigationBar: BottomAppBar(
           child: SizedBox(
@@ -90,7 +86,7 @@ class _AboutPage extends State<AboutPage> {
                 },
                 child: Column(children: [
                   Text(
-                    'Copyright @${DateTime.now().year}, Todos os direitos reservados.',
+                    'Copyright @${DateTime.now().year}, ${context.loc.copyright}.',
                     style: const TextStyle(fontSize: 10),
                   ),
                   const Text(

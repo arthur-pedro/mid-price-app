@@ -205,5 +205,16 @@
                 "example": "2"
             }
         }
-    }
+    },
+    "aboutRebalanceTitle": "About",
+    "aboutRebalanceDesc": "'Rebalance - Average Price Calculator' is a tool offered by Rebalance to help you organize your portfolio. In this app, it is possible to register your portfolio and save your contributions, obtaining the average price of your assets.",
+    "aboutRebalanceDescComplement": "This helping to have a history of your investments, and also supporting and facilitating the income tax return.",
+    "helpUsPlayAdd": "Help us improve by watching an ad.",
+    "playAddSmile": "Watch ad :D",
+    "helpPlataformText": "You are contributing to the improvement of the platform. Thanks for the support! Want to watch another ad?",
+    "yesNiceAds": "Yea! Ads are rock",
+    "meetRebalance": "Meet our portfolio balancer at rebalance.com.br",
+    "questionsAndSugestionContact": "Questions and suggestions, contact us by email: admin@rebalance.com.br",
+    "appVersion": "App version",
+    "copyright": "All rights reserved"
 }
